@@ -9,41 +9,33 @@ class User extends CI_Controller {
     {
         parent::__construct();
         $this->load->model('user_model');
-        $cookie = get_cookie('aplikasi_pos2');
-
-        //$this->session->unset_userdata('user_login');
-        //delete_cookie('aplikasi_pos2');
-
-        if($this->session->user_login) {
-            $user_login = json_decode($this->session->user_login);
-            $is_admin = (boolean) $user_login->is_admin;
-            if ($is_admin) {
-                header("Location:".base_url('admin'));
-            } else {
-                header("Location:".base_url('home'));
-            }
-        } else {
-            if ($cookie) {
-                $user = $this->user_model->get_by_cookie($cookie);
-                $this->user_model->set_by_cookie($user);
-                if((boolean) $user->is_admin) {
-                    header("Location:".base_url('admin'));
-                } else {
-                    header("Location:".base_url('home'));
-                }
-            }
-        }
-        
+        $this->load->helper('user'); // ini helper home made
         
     }
     
 
     public function index()
     {
-        // index yang tertinggal
+
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
+
+        $user_login = json_decode($this->session->user_login);
+        if ($user_login) {
+            $data['username'] = $user_login->username;
+        }
+        $data['title'] = 'Welcome';
+         
+
+        $this->load->view('user/template/header', $data);
+        $this->load->view('user/home/v_home', $data);
+        $this->load->view('user/template/footer', $data);
+
+        
     }
 
     public function login () {
+
+        cek_login(); // ini helper $this->load->helper('user'); home made
         
         $this->form_validation->set_rules(
             'username', 
@@ -127,9 +119,13 @@ class User extends CI_Controller {
             }
             
         }
+        
     }
 
     public function register(){
+
+        cek_login(); // ini helper $this->load->helper('user'); home made
+        
 
         $this->form_validation->set_rules('username', 'Username', array(
             'trim',
@@ -184,12 +180,15 @@ class User extends CI_Controller {
                 $this->load->view('user/template/footer', $data);
             }
         }
+        
 
     }
 
     public function logout() {
+
         $this->session->unset_userdata("user_login");
         delete_cookie("aplikasi_pos2");
+        header("Location:".base_url('user'));
     }
 
     private function data_form_login($value) {

@@ -15,7 +15,7 @@
             <td>{{barang.nama_barang}}</td>
             <td>{{barang.stok_barang}}</td>
             <td>{{barang.harga_jual}}</td>
-            <td><a v-bind:href="'<?= base_url('home/detail_barang/') ?>'+barang.id_barang+'hal<?= $page ?>'" class='btn btn-secondary btn-sm'>Detail</a></td>
+            <td><a v-bind:href="'<?= base_url('barang/detail_barang/') ?>'+barang.id_barang+'hal<?= $page ?>'" class='btn btn-secondary btn-sm'>Detail</a></td>
             <td v-bind:id="'barang'+barang.id_barang"></td>
         </tr>
        

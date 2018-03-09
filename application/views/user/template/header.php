@@ -11,10 +11,11 @@
 <nav class="navbar navbar-light bg-light">
     <span>
         <span class="navbar-brand mb-0 h1">Navbar</span>
-        <a class="navbar-brand" href="<?= base_url('home')?>">Home</a>
-        <a class="navbar-brand" href="<?= base_url('home/katalog_barang')?>">Katalog Barang</a>
-        <a id='tombol_keranjang' class="navbar-brand" href="<?= base_url('home/keranjang_barang')?>">Keranjang Barang</a>
+        <a class="navbar-brand" href="<?= base_url('user')?>">Home</a>
+        <a class="navbar-brand" href="<?= base_url('barang/katalog_barang')?>">Katalog Barang</a>
+        <a id='tombol_keranjang' class="navbar-brand" href="<?= base_url('barang/keranjang_barang')?>">Keranjang Barang</a>
         <?php if($this->session->user_login) : ?>
+            <a class="navbar-brand" onclick="profil()" href='javascript:void(0)'>Profil</a>
             <a class="navbar-brand" onclick="logout()" href='javascript:void(0)'>Logout</a>
         <?php else : ?>
             <a class="navbar-brand" href="<?= base_url('user/login')?>">Login</a>

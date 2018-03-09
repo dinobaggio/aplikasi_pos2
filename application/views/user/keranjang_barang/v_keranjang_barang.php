@@ -15,23 +15,41 @@
             <th scope="col" >Stok Barang</th>
             <th scope="col" >Harga</th>
             <th scope="col" >Jumlah</th>
+            <th scope="col">Jumlah Harga</th>
             <th scope="col" >Detail</th>
         </tr>
 
+       
         <tr v-for="barang in keranjang_data">
+        
             <td>{{barang.id_barang}}</td>
             <td>{{barang.nama_barang}}</td>
             <td>{{barang.stok_barang}}</td>
             <td>{{barang.harga_jual}}</td>
             <td>{{barang.jumlah_beli}}</td>
-            <td><a v-bind:href="'<?= base_url('home/detail_barang/') ?>'+barang.kode_barang" class='btn btn-secondary btn-sm'>Detail</a></td>
+            <td>{{barang.jumlah_harga}}</td>
+            <td><a v-bind:href="'<?= base_url('barang/detail_barang/') ?>'+barang.kode_barang" class='btn btn-secondary btn-sm'>Detail</a></td>
+
+        </tr>
+
+        <tr>
+        <td colspan='7'><hr></td>
         </tr>
        
+       <tr>
+            
+            <td colspan='4'><b>Total</b></td>
+            <td>{{total_harga}}</td>
+            <td colspan='3' ><input type='submit' v-on:click="transaksi_barang()" value='Prosess Transaksi' class='btn btn-primary btn-sm'></td>
+       </tr>
+       
+
     </table>
 
 </div>
 
 <script>
+
 let data = null;
 let keranjang = localStorage.keranjang;
 if (keranjang != null) {   
@@ -44,10 +62,12 @@ if (keranjang != null) {
     }
 }
 
+
 let vm = new Vue({
     el : '#keranjang_barang',
     data : {
         keranjang_data : data,
+        total_harga: null,
         pesan_kosong : '',
         table : false,
         clear: false,
@@ -55,7 +75,21 @@ let vm = new Vue({
     }, 
     methods : {
         cek_keranjang : function () {
+
             if (this.keranjang_data != null) {
+
+                let total_harga_keranjang = 0;
+                let keranjang = this.keranjang_data;
+                for(let i=0;i<keranjang.length;i++){
+                    let harga_jual = Number(keranjang[i].harga_jual);
+                    let jumlah_beli = Number(keranjang[i].jumlah_beli);
+                    let total_harga = harga_jual*jumlah_beli;
+                    keranjang[i].jumlah_harga = total_harga;
+                    total_harga_keranjang += Number(total_harga);
+                }
+
+                this.total_harga = total_harga_keranjang;
+
                 this.table = true;
                 this.clear = true;
                 this.kosong = false;
@@ -68,7 +102,14 @@ let vm = new Vue({
         }, 
         clear_keranjang : function () {
             localStorage.removeItem('keranjang');
-            window.open("<?= base_url('home/keranjang_barang') ?>", "_self");
+            window.open("<?= base_url('barang/keranjang_barang') ?>", "_self");
+        },
+        transaksi_barang : function () {
+            let data = this.keranjang_data;
+            data = JSON.stringify(data);
+            $.post("<?= base_url('barang/transaksi_barang') ?>", {
+                data: data
+            });
         }
     }
 });

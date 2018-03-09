@@ -2,8 +2,8 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Home extends CI_Controller {
-
+class Barang extends CI_Controller {
+    
     
     public function __construct()
     {
@@ -12,41 +12,33 @@ class Home extends CI_Controller {
             'perPage' => 10,
             'instance' => 'halaman'
         );
-        $cookie = get_cookie('aplikasi_pos2');
         $this->load->library('paginator', $params);
-
         $this->load->model('barang_model');
-        if($this->session->user_login) {
-            $user_login = json_decode($this->session->user_login);
-            if ($user_login->is_admin) {
-                header("Location:".base_url('admin'));
-            }
-        } else {
-            if($cookie) {
-                header("Location:".base_url('user/login'));
-            }
-        }
+        $this->load->helper('user'); // ini helper home made
         
     }
     
 
     public function index()
     {
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
+
         $user_login = json_decode($this->session->user_login);
         if ($user_login) {
             $data['username'] = $user_login->username;
         }
         $data['title'] = 'Welcome';
-        
+         
 
         $this->load->view('user/template/header', $data);
         $this->load->view('user/home/v_home', $data);
         $this->load->view('user/template/footer', $data);
+        
     }
 
     public function katalog_barang () {
         
-        
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
         $jumlah_barang = $this->barang_model->jumlah_barang();
         $per_page = $this->paginator->get_perpage();
         $start_from = $this->paginator->get_start();
@@ -65,9 +57,14 @@ class Home extends CI_Controller {
         $this->load->view("user/katalog_barang/v_katalog_barang", $data);
         $this->load->view('user/template/footer', $data);
 
+        
+
     }
 
     public function detail_barang ($string) {
+
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made 
+
         $data['kode_barang'] = $string;
         $string = explode('hal', $string);
         $id_barang = $string[0];
@@ -76,28 +73,35 @@ class Home extends CI_Controller {
         $data['title'] = $data['barang']->nama_barang;
         $data['id_barang'] = $id_barang;
         $data['json_data'] = json_encode($data['barang']);
-        if($this->session->user_login) {
-            $user_login = json_decode($this->session->user_login);
-            $data['user'] = $user_login->username;
-        } else {
-            $data['user'] = 'anonymous';
-        }
+
 
         $this->load->view('user/template/header', $data);
         $this->load->view("user/detail_barang/v_detail_barang", $data);
         $this->load->view('user/template/footer', $data);
+
         
     }
 
     public function keranjang_barang() {
+
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
+
         $data['title'] = "Keranjang Barang";
         
-        $data['data_keranjang'] = $this->load->view('user/keranjang_barang/data_keranjang', '', TRUE);
         $this->load->view('user/template/header', $data);
         $this->load->view('user/keranjang_barang/v_keranjang_barang', $data);
         $this->load->view('user/template/footer', $data);
     }
 
+    public function transaksi_barang() {
+        $data = $this->input->post('data');
+        if($data){
+            echo "<h1>Transaksi Barang</h1>";
+            echo $data;
+        }
+        
+    }
+
 }
 
-/* End of file Home.php */
+/* End of file Barang.php */
