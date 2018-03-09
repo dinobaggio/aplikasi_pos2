@@ -26,7 +26,7 @@
             <td>{{barang.nama_barang}}</td>
             <td>{{barang.stok_barang}}</td>
             <td>{{barang.harga_jual}}</td>
-            <td>{{barang.jumlah_beli}}</td>
+            <td>{{barang.jumlah_barang}}</td>
             <td>{{barang.jumlah_harga}}</td>
             <td><a v-bind:href="'<?= base_url('barang/detail_barang/') ?>'+barang.kode_barang" class='btn btn-secondary btn-sm'>Detail</a></td>
 
@@ -68,6 +68,8 @@ let vm = new Vue({
     data : {
         keranjang_data : data,
         total_harga: null,
+        total_barang: null,
+        id_user: '<?= $id_user; ?>' ,
         pesan_kosong : '',
         table : false,
         clear: false,
@@ -79,16 +81,19 @@ let vm = new Vue({
             if (this.keranjang_data != null) {
 
                 let total_harga_keranjang = 0;
+                let total_barang_keranjang = 0;
                 let keranjang = this.keranjang_data;
                 for(let i=0;i<keranjang.length;i++){
                     let harga_jual = Number(keranjang[i].harga_jual);
-                    let jumlah_beli = Number(keranjang[i].jumlah_beli);
-                    let total_harga = harga_jual*jumlah_beli;
+                    let jumlah_barang = Number(keranjang[i].jumlah_barang);
+                    let total_harga = harga_jual*jumlah_barang;
                     keranjang[i].jumlah_harga = total_harga;
                     total_harga_keranjang += Number(total_harga);
+                    total_barang_keranjang += Number(jumlah_barang);
                 }
 
                 this.total_harga = total_harga_keranjang;
+                this.total_barang = total_barang_keranjang;
 
                 this.table = true;
                 this.clear = true;
@@ -105,11 +110,29 @@ let vm = new Vue({
             window.open("<?= base_url('barang/keranjang_barang') ?>", "_self");
         },
         transaksi_barang : function () {
-            let data = this.keranjang_data;
-            data = JSON.stringify(data);
-            $.post("<?= base_url('barang/transaksi_barang') ?>", {
-                data: data
-            });
+            let konfirmasi = confirm('yakin ingin memproses barang?');
+            if (konfirmasi) {
+                let data_keranjang = this.keranjang_data;
+                let data_transaksi = {
+                    'id_user' : this.id_user,
+                    'total_barang' : this.total_barang,
+                    'total_harga' : this.total_harga
+                }
+
+                data_keranjang = JSON.stringify(data_keranjang);
+                data_transaksi = JSON.stringify(data_transaksi);
+
+                $.post("<?= base_url('barang/transaksi_barang') ?>", {
+                    data_keranjang: data_keranjang,
+                    data_transaksi: data_transaksi
+                }, function (respon) {
+                    let data = JSON.parse(respon);
+                    if(data.sukses) {
+                        localStorage.removeItem('keranjang');
+                        window.open("<?= base_url('barang/transaksi_sukses') ?>?id_transaksi_penjualan="+data.id_transaksi_penjualan, "_self");
+                    }
+                });
+            }
         }
     }
 });

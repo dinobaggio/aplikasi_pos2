@@ -3,6 +3,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Barang extends CI_Controller {
+
     
     
     public function __construct()
@@ -88,18 +89,52 @@ class Barang extends CI_Controller {
 
         $data['title'] = "Keranjang Barang";
         
+        if($this->session->user_login) {
+            $user_login = json_decode($this->session->user_login);
+            $data['id_user'] = $user_login->id_user;
+        } else {
+            $data['id_user'] = "0";
+        }
+        
         $this->load->view('user/template/header', $data);
         $this->load->view('user/keranjang_barang/v_keranjang_barang', $data);
         $this->load->view('user/template/footer', $data);
     }
 
     public function transaksi_barang() {
-        $data = $this->input->post('data');
-        if($data){
-            echo "<h1>Transaksi Barang</h1>";
-            echo $data;
+        $data_keranjang = json_decode($this->input->post('data_keranjang'));
+        $data_transaksi = json_decode($this->input->post('data_transaksi'));
+        $id_transaksi_penjualan = $this->barang_model->insert_transaksi_penjualan($data_transaksi);
+        $tugas = $this->barang_model->insert_penjualan($data_keranjang, $id_transaksi_penjualan);
+        $sukses = new stdClass();
+        $sukses->id_transaksi_penjualan = $id_transaksi_penjualan;
+        $sukses->sukses = true;
+        $sukses = json_encode($sukses);
+        if ($tugas) {
+            echo $sukses;
         }
+    }
+
+    public function transaksi_sukses() {
         
+        $data['title'] = 'Sukses melakukan transaksi';
+        if ($this->input->get('id_transaksi_penjualan')) {
+            $data['id_transaksi_penjualan'] = $this->input->get('id_transaksi_penjualan');
+        } else {
+            $data['id_transaksi_penjualan'] = 0;
+        }
+
+        $this->load->view('user/template/header', $data);
+        $this->load->view('user/keranjang_barang/v_transaksi_sukses', $data);
+        $this->load->view('user/template/footer', $data);
+    }
+
+    public function record_transaksi() {
+        $data['title'] = "Record Transaksi";
+
+        $this->load->view('user/template/header', $data);
+        $this->load->view('user/record_transaksi/v_record_transaksi', $data);
+        $this->load->view('user/template/footer', $data);
     }
 
 }

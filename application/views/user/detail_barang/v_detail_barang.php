@@ -46,7 +46,7 @@ let vm = new Vue({
             if (jumlah != null) {
                 if (jumlah > 0) {
                     if (jumlah <= Number(string_data.stok_barang)) {
-                        string_data.jumlah_beli = Number(jumlah);
+                        string_data.jumlah_barang = Number(jumlah);
                         string_data.kode_barang = this.kode_barang;
                         let keranjang = localStorage.keranjang;
                         
@@ -125,7 +125,7 @@ let vm = new Vue({
                     return keranjang != null;
                 });
                 if (keranjang[index] != null) {
-                    el_jumlah.val(keranjang[index].jumlah_beli);
+                    el_jumlah.val(keranjang[index].jumlah_barang);
                     el_add_keranjang.css('display', 'none');
                     el_cancel_keranjang.css('display', '');
                     el_jumlah.attr('disabled', true);

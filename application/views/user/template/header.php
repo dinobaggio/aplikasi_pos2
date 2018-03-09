@@ -15,6 +15,7 @@
         <a class="navbar-brand" href="<?= base_url('barang/katalog_barang')?>">Katalog Barang</a>
         <a id='tombol_keranjang' class="navbar-brand" href="<?= base_url('barang/keranjang_barang')?>">Keranjang Barang</a>
         <?php if($this->session->user_login) : ?>
+            <a class="navbar-brand" href="<?= base_url('barang/record_transaksi') ?>" >Record Transaksi</a>
             <a class="navbar-brand" onclick="profil()" href='javascript:void(0)'>Profil</a>
             <a class="navbar-brand" onclick="logout()" href='javascript:void(0)'>Logout</a>
         <?php else : ?>

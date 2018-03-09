@@ -28,6 +28,36 @@ class Barang_model extends CI_Model {
         }
     }
 
+    public function insert_transaksi_penjualan ($data_transaksi) {
+
+        $data = array(
+            'id_user' => $data_transaksi->id_user,
+            'total_barang' => $data_transaksi->total_barang,
+            'total_harga' => $data_transaksi->total_harga,
+            'created' =>  date('Y-m-j H:i:s')
+        );
+
+        $this->db->insert('transaksi_penjualan', $data);
+
+        return $this->db->insert_id();
+
+    }
+
+    public function insert_penjualan($data_barang, $id_transaksi_penjualan) {
+        for ($i=0;$i<count($data_barang);$i++) {
+            $data = array(
+                'id_transaksi_penjualan' => $id_transaksi_penjualan,
+                'id_barang' => $data_barang[$i]->id_barang,
+                'jumlah_barang' => $data_barang[$i]->jumlah_barang,
+                'jumlah_harga' => $data_barang[$i]->jumlah_harga,
+                'created' => date("Y-m-j H:i:s")
+            );
+            $this->db->insert('penjualan', $data);
+        }
+
+        return true;
+    }
+
     public function jumlah_barang() {
         $query = $this->db->get('barang');
         return $query->num_rows();
