@@ -13,6 +13,7 @@
         <span class="navbar-brand mb-0 h1">Navbar</span>
         <a class="navbar-brand" href="<?= base_url('admin')?>">Home</a>
         <?php if($this->session->user_login) : ?>
+            <a class="navbar-brand" href="<?= base_url('admin/tambah_barang')?>">Tambah Barang</a>
             <a class="navbar-brand" href="<?= base_url('user/logout')?>">Logout</a>
         <?php endif; ?>
     </span>
