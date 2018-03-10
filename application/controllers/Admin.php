@@ -110,6 +110,116 @@ class Admin extends CI_Controller {
         
     }
 
+    public function tambah_produsen ()  {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        $this->form_validation->set_rules('nama_produsen', 'Nama Produsen', 'required');
+        $this->form_validation->set_message(array(
+            'required' => '* {field} harap diisi'
+        ));
+
+        if ($this->form_validation->run() == false) {
+
+            $ray = array(
+                'nama_produsen' => $this->input->post('nama_produsen')
+            );
+    
+            $value = $this->exists_value_tambah_produsen($ray);
+            $data = $this->data_form_tambah_produsen($value);
+    
+            $data['title'] = "Tambah Produsen";
+    
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
+            $this->load->view('admin/template/footer', $data);
+
+        } else {
+            $ray = array(
+                'nama_produsen' => $this->input->post('nama_produsen')
+            );
+
+            $tugas = $this->admin_model->tambah_produsen($ray);
+            if ($tugas) {
+
+                $ray = array(
+                    'nama_produsen' => ''
+                );
+
+                $value = $this->exists_value_tambah_produsen($ray);
+                $data = $this->data_form_tambah_produsen($value);
+        
+                $data['title'] = "Sukses Menambah Produsen";
+        
+                $this->load->view('admin/template/header', $data);
+                $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
+                $this->load->view('admin/template/footer', $data);
+
+            } else {
+
+                $ray = array(
+                    'nama_produsen' => ''
+                );
+
+                $value = $this->exists_value_tambah_produsen($ray);
+                $data = $this->data_form_tambah_produsen($value);
+        
+                $data['title'] = "Gagal Menambah Produsen";
+        
+                $this->load->view('admin/template/header', $data);
+                $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
+                $this->load->view('admin/template/footer', $data);
+
+            }
+    
+            
+        }
+
+        
+
+    }
+
+    public function tambah_pembelian ($id_produsen = false) {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        if ($id_produsen == false) {
+            $data['title'] = "Pilih Produsen";
+            $data['data_produsen'] = json_encode($this->admin_model->list_produsen());
+            
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/tambah_pembelian/v_tambah_pembelian', $data);
+            $this->load->view('admin/template/footer', $data);
+        } else {
+            $data['title'] = "Pilih barang";
+            $data['data_barang'] = $this->admin_model->list_barang($id_produsen);
+            
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/tambah_pembelian/v_tambah_pembelian', $data);
+            $this->load->view('admin/template/footer', $data);
+        }
+    }
+
+    public function list_produsen () {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        $data['title'] = "List Produsen";
+        $data['data_produsen'] = json_encode($this->admin_model->list_produsen());
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/list_produsen/v_list_produsen', $data);
+        $this->load->view('admin/template/footer', $data);
+
+    }
+
+    public function detail_produsen ($id_produsen) {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $data['data_produsen'] = $this->admin_model->list_produsen($id_produsen);
+        $data['title'] = "Detail Produsen";
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/detail_produsen/v_detail_produsen', $data);
+        $this->load->view('admin/template/footer', $data);
+
+    }
+
     private function data_form_tambah_barang ($value) {
         $data['form_att'] = array(
             'id' => 'form_tambah_barang'
@@ -173,6 +283,40 @@ class Admin extends CI_Controller {
         );
 
         return $value;
+    }
+
+    private function data_form_tambah_produsen ($value) {
+        $data['form_att'] = array(
+            'id' => 'form_tambah_produsen'
+        );
+        $data['input_nama_produsen'] = array(
+            'name' => 'nama_produsen',
+            'type' => 'text',
+            'placeholder' => 'Nama Produsen',
+            'value' => $value['nama_produsen']
+        );
+        $data['input_submit'] = array(
+            'type' => 'submit',
+            'value' => 'Simpan'
+        );
+
+        return $data;
+    }
+
+    private function exists_value_tambah_produsen ($ray) {
+
+        $nama_produsen = $ray['nama_produsen'];
+        
+        if (empty($nama_produsen)) {
+            $nama_produsen = '';
+        }
+       
+        $value = array(
+            'nama_produsen' => $nama_produsen
+        );
+
+        return $value;
+
     }
 
 }
