@@ -29,7 +29,9 @@ class Admin extends CI_Controller {
         
     }
 
-    public function tambah_barang () {
+    public function tambah_barang ($id_produsen) {
+        
+        
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
 
         $this->form_validation->set_rules('nama_barang', 'Nama Barang', 'required');
@@ -44,6 +46,7 @@ class Admin extends CI_Controller {
         ));
 
         $ray = array(
+            'id_produsen' => $id_produsen,
             'nama_barang' => $this->input->post('nama_barang'),
             'stok_barang' => $this->input->post('stok_barang'),
             'harga_jual' => $this->input->post('harga_jual'),
@@ -51,10 +54,10 @@ class Admin extends CI_Controller {
         );
 
         if ($this->form_validation->run() == false ) {
-
+            
             $value = $this->exists_value_tambah_barang($ray);
             $data = $this->data_form_tambah_barang($value);
-            
+            $data['id_produsen'] = $id_produsen;
             $data['title'] = "Tambah Barang";
             $this->load->view('admin/template/header', $data);
             $this->load->view('admin/tambah_barang/v_tambah_barang_form', $data);
@@ -63,6 +66,7 @@ class Admin extends CI_Controller {
         } else {
 
             $ray = array(
+                'id_produsen' => $id_produsen,
                 'nama_barang' => $this->input->post('nama_barang'),
                 'stok_barang' => $this->input->post('stok_barang'),
                 'harga_jual' => $this->input->post('harga_jual'),
@@ -71,6 +75,7 @@ class Admin extends CI_Controller {
             $tugas = $this->admin_model->tambah_barang($ray);
             if ($tugas) {
                 $ray = array(
+                    'id_produsen' => $id_produsen,
                     'nama_barang' => '',
                     'stok_barang' => '',
                     'harga_jual' => '',
@@ -79,6 +84,7 @@ class Admin extends CI_Controller {
 
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
+                $data['id_produsen'] = $id_produsen;
                 
                 $data['title'] = "Tambah Barang Sukses";
                 $this->load->view('admin/template/header', $data);
@@ -88,6 +94,7 @@ class Admin extends CI_Controller {
             } else {
 
                 $ray = array(
+                    'id_produsen' => $id_produsen,
                     'nama_barang' => '',
                     'stok_barang' => '',
                     'harga_jual' => '',
@@ -96,6 +103,7 @@ class Admin extends CI_Controller {
                 
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
+                $data['id_produsen'] = $id_produsen;
                 
                 $data['title'] = "Tambah Barang Gagal";
                 $this->load->view('admin/template/header', $data);
@@ -105,7 +113,6 @@ class Admin extends CI_Controller {
             }
 
         }
-
         
         
     }
@@ -213,6 +220,8 @@ class Admin extends CI_Controller {
     public function detail_produsen ($id_produsen) {
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
         $data['data_produsen'] = $this->admin_model->list_produsen($id_produsen);
+        $data['data_barang'] = json_encode($this->admin_model->produsen_barang($id_produsen));
+        $data['id_produsen'] = $id_produsen;
         $data['title'] = "Detail Produsen";
         $this->load->view('admin/template/header', $data);
         $this->load->view('admin/detail_produsen/v_detail_produsen', $data);
@@ -223,6 +232,11 @@ class Admin extends CI_Controller {
     private function data_form_tambah_barang ($value) {
         $data['form_att'] = array(
             'id' => 'form_tambah_barang'
+        );
+        $data['input_id_produsen'] = array(
+            'name' => 'id_produsen',
+            'disabled' => 'true',
+            'value' => $value['id_produsen']
         );
         $data['input_nama_barang'] = array(
             'name' => 'nama_barang',
@@ -257,11 +271,15 @@ class Admin extends CI_Controller {
     }
 
     private function exists_value_tambah_barang($ray) {
+        $id_produsen = $ray['id_produsen'];
         $nama_barang = $ray['nama_barang'];
         $stok_barang = $ray['stok_barang'];
         $harga_jual = $ray['harga_jual'];
         $harga_beli = $ray['harga_beli'];
 
+        if (empty($id_produsen)) {
+            $id_produsen = '';
+        }
         if (empty($nama_barang)) {
             $nama_barang = '';
         }
@@ -276,6 +294,7 @@ class Admin extends CI_Controller {
         }
         
         $value = array(
+            'id_produsen' => $id_produsen,
             'nama_barang' => $nama_barang,
             'stok_barang' => $stok_barang,
             'harga_jual' => $harga_jual,

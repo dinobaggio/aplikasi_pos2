@@ -31,6 +31,17 @@ class Admin_model extends CI_Model {
         }
     }
 
+    public function produsen_barang ($id_produsen) {
+        $this->db->select("*");
+        $this->db->from("produsen");
+        $this->db->join("barang", "produsen.id_produsen = barang.id_produsen");
+        $this->db->where(array(
+            'barang.id_produsen' => $id_produsen
+        ));
+        $hasil = $this->db->get();
+        return $hasil->result();
+    }
+
 }
 
 /* End of file Admin_model.php */
