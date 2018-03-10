@@ -102,6 +102,7 @@ class Barang extends CI_Controller {
     }
 
     public function transaksi_barang() {
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
         $data_keranjang = json_decode($this->input->post('data_keranjang'));
         $data_transaksi = json_decode($this->input->post('data_transaksi'));
         $id_transaksi_penjualan = $this->barang_model->insert_transaksi_penjualan($data_transaksi);
@@ -116,6 +117,7 @@ class Barang extends CI_Controller {
     }
 
     public function transaksi_sukses() {
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
         
         $data['title'] = 'Sukses melakukan transaksi';
         if ($this->input->get('id_transaksi_penjualan')) {
@@ -130,10 +132,44 @@ class Barang extends CI_Controller {
     }
 
     public function record_transaksi() {
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
+        cek_tidak_login(); // ini helper $this->load->helper('user'); home made
+        $user_login = json_decode($this->session->user_login);
+        $id_user = $user_login->id_user;
+        $per_page = $this->paginator->get_perpage();
+        $start_from = $this->paginator->get_start();
+        $paginator = array(
+            'perpage'=> $per_page,
+            'from' => $start_from
+        );
+
+        $jumlah_record = $this->barang_model->jumlah_record_transaksi($id_user);
+        $data['data_transaksi'] = json_encode($this->barang_model->record_transaksi($id_user, $paginator));
+
+        $this->paginator->set_total($jumlah_record);
+
         $data['title'] = "Record Transaksi";
+        $data['page_links'] = $this->paginator->page_links();
 
         $this->load->view('user/template/header', $data);
         $this->load->view('user/record_transaksi/v_record_transaksi', $data);
+        $this->load->view('user/template/footer', $data);
+    }
+
+    public function detail_transaksi ($id_transaksi_penjualan) {
+        if (!$id_transaksi_penjualan) {
+            header('Location:'.base_url('user'));
+        }
+        cek_login_admin(); // ini helper $this->load->helper('user'); home made
+        cek_tidak_login(); // ini helper $this->load->helper('user'); home made
+        
+        
+
+        $data['title'] = "Detail Transaksi";
+        $data['detail_transaksi'] = json_encode($this->barang_model->detail_record_transaksi_penjualan($id_transaksi_penjualan));
+
+        $this->load->view('user/template/header', $data);
+        $this->load->view('user/record_transaksi/v_detail_transaksi', $data);
         $this->load->view('user/template/footer', $data);
     }
 

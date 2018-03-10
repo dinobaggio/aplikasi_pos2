@@ -119,3 +119,19 @@ if ( ! function_exists('cek_bukan_admin')) {
     }
 
 }
+
+if ( ! function_exists('cek_tidak_login') ) {
+
+    function cek_tidak_login() {
+
+        global $CI;
+        
+        if( ! $CI->session->user_login ) {
+
+            header("Location:".base_url('user/login'));
+
+        }
+
+    }
+
+} 

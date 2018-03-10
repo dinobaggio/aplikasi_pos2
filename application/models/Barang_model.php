@@ -58,6 +58,52 @@ class Barang_model extends CI_Model {
         return true;
     }
 
+    public function record_transaksi ($id_user, $paginator) {
+
+        $this->db->select("user.id_user,
+        username, 
+        id_transaksi_penjualan, 
+        total_barang, 
+        total_harga, 
+        transaksi_penjualan.created
+        ");
+
+        $this->db->from("user");
+        $this->db->join("transaksi_penjualan", " transaksi_penjualan.id_user = user.id_user");
+        $this->db->limit($paginator['perpage'], $paginator['from']);
+        $this->db->where(array('user.id_user' => $id_user));
+        $tugas = $this->db->get();
+        return $tugas->result();
+
+    }
+
+    public function jumlah_record_transaksi($id_user) {
+        $this->db->select("user.id_user");
+        $this->db->from("user");
+        $this->db->join("transaksi_penjualan", " transaksi_penjualan.id_user = user.id_user");
+        $this->db->where(array('user.id_user' => $id_user));
+        $tugas = $this->db->get();
+        return $tugas->num_rows();
+    }
+
+    public function detail_record_transaksi_penjualan ($id_transaksi_penjualan) {
+        $this->db->select("
+            transaksi_penjualan.id_transaksi_penjualan, 
+            penjualan.id_penjualan, 
+            barang.nama_barang, 
+            penjualan.jumlah_barang,
+            penjualan.jumlah_harga,
+            penjualan.created
+        ");
+        $this->db->from("transaksi_penjualan");
+        $this->db->join("penjualan", "penjualan.id_transaksi_penjualan = transaksi_penjualan.id_transaksi_penjualan");
+        $this->db->join("barang", "penjualan.id_barang = barang.id_barang");
+        $this->db->where(array('transaksi_penjualan.id_transaksi_penjualan' => $id_transaksi_penjualan));
+        $tugas = $this->db->get();
+        return $tugas->result();
+
+    }
+
     public function jumlah_barang() {
         $query = $this->db->get('barang');
         return $query->num_rows();
