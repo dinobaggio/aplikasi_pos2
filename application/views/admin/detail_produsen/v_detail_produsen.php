@@ -12,12 +12,7 @@
         <tr>
             <th>List Barang</th>
             <th>
-                <!-- <?= form_open("admin/tambah_barang") ?>
-                <?= form_input(array( 'name'=> 'id_produsen', 'value' => $id_produsen, 'type'=>'hidden' )) ?>
-                <?= form_submit(array( 'value'=>'Tambah Barang' )) ?>
-                <?= form_close() ?> -->
-
-                <a href="<?= base_url('admin/tambah_barang/'.$id_produsen) ?>">Tambah Barang</a>
+                <a href="<?= base_url('admin/tambah_barang') ?>">Tambah Barang</a>
             </th>
             
         </tr>

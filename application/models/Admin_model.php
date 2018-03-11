@@ -32,7 +32,14 @@ class Admin_model extends CI_Model {
     }
 
     public function produsen_barang ($id_produsen) {
-        $this->db->select("*");
+        $this->db->select("
+        barang.id_barang, 
+        barang.nama_barang, 
+        barang.stok_barang,
+        barang.harga_jual,
+        barang.harga_beli,
+        produsen.id_produsen
+        ");
         $this->db->from("produsen");
         $this->db->join("barang", "produsen.id_produsen = barang.id_produsen");
         $this->db->where(array(
@@ -40,6 +47,41 @@ class Admin_model extends CI_Model {
         ));
         $hasil = $this->db->get();
         return $hasil->result();
+    }
+
+    public function list_value_produsen () {
+        $this->db->select('id_produsen, nama_produsen');
+        $this->db->from('produsen');
+        $hasil = $this->db->get();
+        return $hasil->result();
+    }
+
+    public function cek_id_produsen($id_produsen) {
+        if(empty($id_produsen)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function get_barang($data) {
+        $id_barang = $data['id_barang'];
+        $id_produsen = $data['id_produsen'];
+        if ($id_barang != false) {
+            $this->db->select("
+            id_barang,
+            nama_barang,
+            stok_barang,
+            harga_beli,
+            harga_jual");
+            $this->db->from('barang');
+            $this->db->where(array(
+                'id_barang' => $id_barang,
+                'id_produsen' => $id_produsen
+            ));
+            $tugas = $this->db->get();
+            return $tugas->row();
+        }
     }
 
 }

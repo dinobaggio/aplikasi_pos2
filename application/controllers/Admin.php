@@ -29,11 +29,18 @@ class Admin extends CI_Controller {
         
     }
 
-    public function tambah_barang ($id_produsen) {
+    public function tambah_barang () {
         
         
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
-
+        
+        $this->form_validation->set_rules('id_produsen', 'Produsen', array(
+            'required',
+            array(
+                'value_produsen',
+                array($this->admin_model, 'cek_id_produsen')
+            )
+        ));
         $this->form_validation->set_rules('nama_barang', 'Nama Barang', 'required');
         $this->form_validation->set_rules('stok_barang', 'Stok Barang', 'trim|required|numeric');
         $this->form_validation->set_rules('harga_jual', 'Harga Jual', 'trim|required|numeric');
@@ -42,11 +49,12 @@ class Admin extends CI_Controller {
         $this->form_validation->set_message(array(
             'required' => '* {field} Harap diisi',
             'alpha_numeric' => '* {field} Hanya terdiri dari angka atau alfabet saja',
-            'numeric' => '* {field} Harus angka'
+            'numeric' => '* {field} Harus angka',
+            'value_produsen' => '* {field} Harus dipilih'
         ));
 
         $ray = array(
-            'id_produsen' => $id_produsen,
+            'id_produsen' => $this->input->post('id_produsen'),
             'nama_barang' => $this->input->post('nama_barang'),
             'stok_barang' => $this->input->post('stok_barang'),
             'harga_jual' => $this->input->post('harga_jual'),
@@ -57,7 +65,6 @@ class Admin extends CI_Controller {
             
             $value = $this->exists_value_tambah_barang($ray);
             $data = $this->data_form_tambah_barang($value);
-            $data['id_produsen'] = $id_produsen;
             $data['title'] = "Tambah Barang";
             $this->load->view('admin/template/header', $data);
             $this->load->view('admin/tambah_barang/v_tambah_barang_form', $data);
@@ -66,7 +73,7 @@ class Admin extends CI_Controller {
         } else {
 
             $ray = array(
-                'id_produsen' => $id_produsen,
+                'id_produsen' => $this->input->post('id_produsen'),
                 'nama_barang' => $this->input->post('nama_barang'),
                 'stok_barang' => $this->input->post('stok_barang'),
                 'harga_jual' => $this->input->post('harga_jual'),
@@ -75,7 +82,7 @@ class Admin extends CI_Controller {
             $tugas = $this->admin_model->tambah_barang($ray);
             if ($tugas) {
                 $ray = array(
-                    'id_produsen' => $id_produsen,
+                    'id_produsen' => '',
                     'nama_barang' => '',
                     'stok_barang' => '',
                     'harga_jual' => '',
@@ -84,7 +91,6 @@ class Admin extends CI_Controller {
 
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
-                $data['id_produsen'] = $id_produsen;
                 
                 $data['title'] = "Tambah Barang Sukses";
                 $this->load->view('admin/template/header', $data);
@@ -94,7 +100,7 @@ class Admin extends CI_Controller {
             } else {
 
                 $ray = array(
-                    'id_produsen' => $id_produsen,
+                    'id_produsen' => '',
                     'nama_barang' => '',
                     'stok_barang' => '',
                     'harga_jual' => '',
@@ -103,7 +109,6 @@ class Admin extends CI_Controller {
                 
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
-                $data['id_produsen'] = $id_produsen;
                 
                 $data['title'] = "Tambah Barang Gagal";
                 $this->load->view('admin/template/header', $data);
@@ -197,12 +202,32 @@ class Admin extends CI_Controller {
             $this->load->view('admin/template/footer', $data);
         } else {
             $data['title'] = "Pilih barang";
-            $data['data_barang'] = $this->admin_model->list_barang($id_produsen);
+            $data['data_barang'] = json_encode($this->admin_model->produsen_barang($id_produsen));
+            $data['id_produsen'] = $id_produsen;
             
             $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/tambah_pembelian/v_tambah_pembelian', $data);
+            $this->load->view('admin/tambah_pembelian/v_list_barang', $data);
             $this->load->view('admin/template/footer', $data);
         }
+
+    }
+
+    public function detail_barang_beli ($string) {
+        $string = explode('produsen', $string);
+        $id_produsen = $string[1];
+        $id_barang = $string[0];
+        $barang = array(
+            'id_barang' => $id_barang,
+            'id_produsen' => $id_produsen
+        );
+        $data['data_barang'] = $this->admin_model->get_barang($barang);
+        $data['id_produsen'] = $id_produsen;
+        $data['title'] = 'detail barang';
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/tambah_pembelian/v_detail_barang', $data);
+        $this->load->view('admin/template/footer', $data);
+
     }
 
     public function list_produsen () {
@@ -233,11 +258,9 @@ class Admin extends CI_Controller {
         $data['form_att'] = array(
             'id' => 'form_tambah_barang'
         );
-        $data['input_id_produsen'] = array(
-            'name' => 'id_produsen',
-            'disabled' => 'true',
-            'value' => $value['id_produsen']
-        );
+        
+        $data['produsen_value'] = $this->list_value_produsen();
+
         $data['input_nama_barang'] = array(
             'name' => 'nama_barang',
             'type' => 'text',
@@ -267,6 +290,11 @@ class Admin extends CI_Controller {
             'value' => 'Simpan'
         );
 
+        return $data;
+    }
+
+    private function list_value_produsen() {
+        $data = $this->admin_model->list_value_produsen();
         return $data;
     }
 
