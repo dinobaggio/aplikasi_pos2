@@ -43,6 +43,7 @@ let vm = new Vue({
                         return keranjang != null;
                     });
                     if (filter[0] != null) {
+                        
                         this.table_keranjang = true;
                         this.button_proses = 'Proses Keranjang (' +filter.length+')';
                     }

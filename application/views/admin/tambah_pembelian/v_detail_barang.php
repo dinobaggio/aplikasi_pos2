@@ -74,7 +74,7 @@ let vm = new Vue({
                 if(jumlah_barang >= 1) {
                     if (jumlah_barang <= stok_barang) {
 
-                        data = {
+                        let data = {
                             id_produsen : this.id_produsen,
                             id_barang : this.id_barang,
                             nama_barang : this.nama_barang,
@@ -82,9 +82,22 @@ let vm = new Vue({
                             stok_barang : stok_barang,
                             jumlah_barang : jumlah_barang,
                             jumlah_harga : jumlah_harga 
-                        }
+                        } 
 
-                        keranjang[index] = data;
+                        if (keranjang[this.id_produsen] != null) {
+                            let isi_produsen = JSON.stringify(keranjang[this.id_produsen]);
+                            if (isi_produsen[0] == '[' && isi_produsen[isi_produsen.length-1] == ']') {
+                                keranjang[this.id_produsen][index] = data;
+                            } else {
+                                keranjang[this.id_produsen] = [];
+                                keranjang[this.id_produsen][index] = data;
+                            }
+                            
+                        } else {
+                            keranjang[this.id_produsen] = [];
+                            keranjang[this.id_produsen][index] = data;
+                        }
+                        
 
                         localStorage.keranjang = JSON.stringify(keranjang);
 
@@ -132,7 +145,7 @@ let vm = new Vue({
             let el_tambahkan = $('#tambahkan');
             let index = Number(this.id_barang);
             let keranjang = JSON.parse(localStorage.keranjang);
-            keranjang[index] = null;
+            keranjang[this.id_produsen][index] = null;
             localStorage.keranjang = JSON.stringify(keranjang);
             el_tambahkan.css('display', '');
             el_cancel.css('display', 'none');
@@ -153,11 +166,13 @@ let vm = new Vue({
                     let filter_data = keranjang.filter(function (keranjang) {
                         return keranjang != null;
                     });
-                    if (keranjang[index] != null) {
-                        this.jumlah_barang = keranjang[index].jumlah_barang;
-                        el_tambahkan.css('display', 'none');
-                        el_cancel.css('display', '');
-                        el_jumlah.attr('disabled', true);
+                    if (keranjang[this.id_produsen] != null) {
+                        if (keranjang[this.id_produsen][index] != null ) {
+                            this.jumlah_barang = keranjang[this.id_produsen][index].jumlah_barang;
+                            el_tambahkan.css('display', 'none');
+                            el_cancel.css('display', '');
+                            el_jumlah.attr('disabled', true);
+                        }
                     }
                     if (filter_data[0] == null) {
                         localStorage.removeItem('keranjang');
