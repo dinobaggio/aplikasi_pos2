@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 11, 2018 at 08:24 AM
+-- Generation Time: Mar 12, 2018 at 11:13 AM
 -- Server version: 10.1.30-MariaDB
 -- PHP Version: 7.0.27
 
@@ -1045,12 +1045,12 @@ INSERT INTO `barang` (`id_barang`, `id_produsen`, `nama_barang`, `stok_barang`, 
 (999, 0, 'Pilocarpine hydrochloride', 32, 4041, 2850, '2017-12-13 18:14:13'),
 (1000, 0, 'Dicyclomine Hydrochloride', 47, 1467, 4395, '2017-03-22 01:30:26'),
 (1001, 0, 'permen sugus', 20, 2000, 1500, '2018-03-10 10:10:59'),
-(1002, 2, 'Coki', 20, 1000, 500, '2018-03-10 17:37:34'),
-(1003, 2, 'cokolator', 31, 2000, 500, '2018-03-10 17:53:03'),
-(1004, 2, 'Frutang', 59, 2000, 500, '2018-03-10 17:53:50'),
-(1005, 1, 'Bolu', 59, 5000, 3500, '2018-03-11 07:35:08'),
-(1006, 3, 'Mie', 78, 2500, 1500, '2018-03-11 07:38:24'),
-(1007, 3, 'Kinderjoey', 50, 6000, 5000, '2018-03-11 09:19:42');
+(1002, 2, 'Coki', 30, 1000, 500, '2018-03-10 17:37:34'),
+(1003, 2, 'cokolator', 50, 2000, 500, '2018-03-10 17:53:03'),
+(1004, 2, 'Frutang', 80, 2000, 500, '2018-03-10 17:53:50'),
+(1005, 1, 'Bolu', 90, 5000, 3500, '2018-03-11 07:35:08'),
+(1006, 3, 'Mie', 80, 2500, 1500, '2018-03-11 07:38:24'),
+(1007, 3, 'Kinderjoey', 60, 6000, 5000, '2018-03-11 09:19:42');
 
 -- --------------------------------------------------------
 
@@ -1065,6 +1065,27 @@ CREATE TABLE `log_pembelian` (
   `jumlah_barang` int(11) NOT NULL,
   `created` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `log_pembelian`
+--
+
+INSERT INTO `log_pembelian` (`id_log_pembelian`, `id_pembelian`, `id_barang`, `jumlah_barang`, `created`) VALUES
+(1, 0, 1002, 3, '0000-00-00 00:00:00'),
+(2, 0, 1003, 2, '0000-00-00 00:00:00'),
+(3, 0, 1005, 2, '0000-00-00 00:00:00'),
+(4, 0, 1005, 9, '0000-00-00 00:00:00'),
+(5, 0, 1002, 2, '0000-00-00 00:00:00'),
+(6, 0, 1003, 2, '0000-00-00 00:00:00'),
+(7, 0, 1004, 11, '0000-00-00 00:00:00'),
+(8, 0, 1005, 10, '0000-00-00 00:00:00'),
+(9, 0, 1002, 5, '0000-00-00 00:00:00'),
+(10, 0, 1003, 5, '0000-00-00 00:00:00'),
+(11, 0, 1004, 10, '0000-00-00 00:00:00'),
+(12, 0, 1006, 2, '0000-00-00 00:00:00'),
+(13, 0, 1007, 10, '0000-00-00 00:00:00'),
+(14, 0, 1005, 10, '0000-00-00 00:00:00'),
+(15, 0, 1003, 10, '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -1175,13 +1196,35 @@ INSERT INTO `pelanggan` (`id_user`, `nama_pelanggan`) VALUES
 
 CREATE TABLE `pembelian` (
   `id_pembelian` int(11) NOT NULL,
+  `id_transaksi_pembelian` int(11) NOT NULL,
   `id_barang` int(11) NOT NULL,
   `id_produsen` int(11) NOT NULL,
   `jumlah_barang` int(11) NOT NULL,
-  `total_harga` double NOT NULL,
+  `jumlah_harga` double NOT NULL,
   `created` datetime NOT NULL,
   `updated` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `pembelian`
+--
+
+INSERT INTO `pembelian` (`id_pembelian`, `id_transaksi_pembelian`, `id_barang`, `id_produsen`, `jumlah_barang`, `jumlah_harga`, `created`, `updated`) VALUES
+(1, 4, 1002, 2, 3, 1500, '2018-03-12 17:01:34', '0000-00-00 00:00:00'),
+(2, 4, 1003, 2, 2, 1000, '2018-03-12 17:01:34', '0000-00-00 00:00:00'),
+(3, 5, 1005, 1, 2, 7000, '2018-03-12 17:03:04', '0000-00-00 00:00:00'),
+(4, 6, 1005, 1, 9, 31500, '2018-03-12 17:04:16', '0000-00-00 00:00:00'),
+(5, 6, 1002, 2, 2, 1000, '2018-03-12 17:04:17', '0000-00-00 00:00:00'),
+(6, 6, 1003, 2, 2, 1000, '2018-03-12 17:04:17', '0000-00-00 00:00:00'),
+(7, 6, 1004, 2, 11, 5500, '2018-03-12 17:04:17', '0000-00-00 00:00:00'),
+(8, 7, 1005, 1, 10, 35000, '2018-03-12 17:10:54', '0000-00-00 00:00:00'),
+(9, 7, 1002, 2, 5, 2500, '2018-03-12 17:10:54', '0000-00-00 00:00:00'),
+(10, 7, 1003, 2, 5, 2500, '2018-03-12 17:10:54', '0000-00-00 00:00:00'),
+(11, 7, 1004, 2, 10, 5000, '2018-03-12 17:10:54', '0000-00-00 00:00:00'),
+(12, 7, 1006, 3, 2, 3000, '2018-03-12 17:10:55', '0000-00-00 00:00:00'),
+(13, 7, 1007, 3, 10, 50000, '2018-03-12 17:10:55', '0000-00-00 00:00:00'),
+(14, 8, 1005, 1, 10, 35000, '2018-03-12 17:11:48', '0000-00-00 00:00:00'),
+(15, 8, 1003, 2, 10, 5000, '2018-03-12 17:11:48', '0000-00-00 00:00:00');
 
 --
 -- Triggers `pembelian`
@@ -1325,6 +1368,34 @@ INSERT INTO `produsen` (`id_produsen`, `nama_produsen`, `created`, `updated`) VA
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `transaksi_pembelian`
+--
+
+CREATE TABLE `transaksi_pembelian` (
+  `id_transaksi_pembelian` int(11) NOT NULL,
+  `total_barang` int(11) NOT NULL,
+  `total_harga` double NOT NULL,
+  `created` datetime NOT NULL,
+  `updated` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `transaksi_pembelian`
+--
+
+INSERT INTO `transaksi_pembelian` (`id_transaksi_pembelian`, `total_barang`, `total_harga`, `created`, `updated`) VALUES
+(1, 5, 2500, '2018-03-12 16:57:46', '0000-00-00 00:00:00'),
+(2, 5, 2500, '2018-03-12 16:58:59', '0000-00-00 00:00:00'),
+(3, 5, 2500, '2018-03-12 16:59:00', '0000-00-00 00:00:00'),
+(4, 5, 2500, '2018-03-12 17:01:34', '0000-00-00 00:00:00'),
+(5, 2, 7000, '2018-03-12 17:03:04', '0000-00-00 00:00:00'),
+(6, 24, 39000, '2018-03-12 17:04:16', '0000-00-00 00:00:00'),
+(7, 42, 98000, '2018-03-12 17:10:54', '0000-00-00 00:00:00'),
+(8, 20, 40000, '2018-03-12 17:11:48', '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `transaksi_penjualan`
 --
 
@@ -1387,7 +1458,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `username`, `password`, `cookie`, `is_admin`, `created`, `updated`) VALUES
-(1, 'admin', '$2y$10$tplstsTv8SYhN9xTsH5YOe19jF8BNcdHhMYEswgYlp.BgOEuFgf7y', '1Hw3pTk9FdYiMPNy8gZJDA0kXGwcmqsA48KISCM3tWEWb0DynYV2s1XfCLaeabRz', '1', '2018-03-04 13:36:33', '0000-00-00 00:00:00'),
+(1, 'admin', '$2y$10$tplstsTv8SYhN9xTsH5YOe19jF8BNcdHhMYEswgYlp.BgOEuFgf7y', 'emhNxUHYftz8lN2bsfKwiLAkWd56IFUBJbTwl0pgk7Sr4ZvE8qzpyPrLnjRjO4G0', '1', '2018-03-04 13:36:33', '0000-00-00 00:00:00'),
 (2, 'user', '$2y$10$jUnncavC73WrpB5PLVOazuC3iti9Tt3mMpLAAdn9QSS9AKTbkg3WK', 'zu2Idx54HVcKdhil8JX6VeEGjolAO0GtxaW2igb7pCnsP1R79uODpyYTfF6LPJMB', '0', '2018-03-04 16:39:10', '0000-00-00 00:00:00');
 
 --
@@ -1447,6 +1518,12 @@ ALTER TABLE `produsen`
   ADD PRIMARY KEY (`id_produsen`);
 
 --
+-- Indexes for table `transaksi_pembelian`
+--
+ALTER TABLE `transaksi_pembelian`
+  ADD PRIMARY KEY (`id_transaksi_pembelian`);
+
+--
 -- Indexes for table `transaksi_penjualan`
 --
 ALTER TABLE `transaksi_penjualan`
@@ -1472,7 +1549,7 @@ ALTER TABLE `barang`
 -- AUTO_INCREMENT for table `log_pembelian`
 --
 ALTER TABLE `log_pembelian`
-  MODIFY `id_log_pembelian` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_log_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `log_penjualan`
@@ -1490,7 +1567,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT for table `pembelian`
 --
 ALTER TABLE `pembelian`
-  MODIFY `id_pembelian` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `penjualan`
@@ -1503,6 +1580,12 @@ ALTER TABLE `penjualan`
 --
 ALTER TABLE `produsen`
   MODIFY `id_produsen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `transaksi_pembelian`
+--
+ALTER TABLE `transaksi_pembelian`
+  MODIFY `id_transaksi_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `transaksi_penjualan`

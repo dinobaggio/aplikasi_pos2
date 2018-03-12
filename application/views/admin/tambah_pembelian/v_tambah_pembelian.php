@@ -17,7 +17,7 @@
 
         <tr>
             <td colspan='2' align='center'>
-                <button id="proses_barang" class='btn btn-success btn-sm'>{{button_proses}}</button>
+                <button id="proses_barang" v-on:click="proses_pembelian()" class='btn btn-success btn-sm'>{{button_proses}}</button>
                 <button v-on:click="clear()" class='btn btn-danger btn-sm'>Clear</button>
             </td>
         </tr>
@@ -74,6 +74,49 @@ let vm = new Vue({
             } else {
                 el_proses.attr('disabled', true);
                 this.button_proses = "Proses Keranjang";
+            }
+        },
+        proses_pembelian : function () {
+            let keranjang = localStorage.keranjang;
+            let total_barang = 0;
+            let total_harga = 0;
+            if (keranjang != null) {
+                if (keranjang[0] == '[' && keranjang[keranjang.length-1] ==']') {
+                    keranjang = JSON.parse(keranjang);
+                    keranjang = keranjang.filter(function (data) {
+                        return data != null
+                    });
+                    if (keranjang[0] != null) {
+                        for (let i=0;i<keranjang.length;i++) {
+                            let barang = keranjang[i];
+                            barang = barang.filter(function (data) {
+                                return data != null;
+                            });
+                            for(let i=0;i<barang.length;i++) {
+                                total_barang += Number(barang[i].jumlah_barang);
+                                total_harga += Number(barang[i].jumlah_harga);
+                            }
+                            
+                            keranjang[i] = barang;
+                        }
+                        let data_transaksi = {
+                            total_harga : total_harga,
+                            total_barang : total_barang
+                        }
+                        data_transaksi = JSON.stringify(data_transaksi);
+                        let data_barang = JSON.stringify(keranjang);
+                        $.post("<?= base_url('admin/proses_pembelian')?>", {
+                            data_barang : data_barang,
+                            data_transaksi : data_transaksi
+                        }, function (respon) {
+                            let data = JSON.parse(respon);
+                            if(data.sukses) {
+                                localStorage.removeItem('keranjang');
+                                window.open("<?= base_url('admin/transaksi_sukses') ?>?id_transaksi_pembelian="+data.id_transaksi_pembelian, "_self");
+                            }
+                        });
+                    }
+                }
             }
         },
         clear : function () {

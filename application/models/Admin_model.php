@@ -84,6 +84,29 @@ class Admin_model extends CI_Model {
         }
     }
 
+    public function transaksi_pembelian($beli) {
+        $data = array(
+            'total_barang' => $beli['total_barang'],
+            'total_harga' => $beli['total_harga'],
+            'created' => date("Y-m-j H:i:s")
+        );
+        $this->db->insert('transaksi_pembelian', $data);
+        return $this->db->insert_id();
+    }
+
+    public function pembelian ($beli) {
+        $data = array(
+            'id_transaksi_pembelian' => $beli['id_transaksi_pembelian'],
+            'id_barang' => $beli['id_barang'],
+            'id_produsen' => $beli['id_produsen'],
+            'jumlah_barang' => $beli['jumlah_barang'],
+            'jumlah_harga' => $beli['jumlah_harga'],
+            'created' => date("Y-m-j H:i:s")
+        );
+        $this->db->insert('pembelian', $data);
+        return $this->db->insert_id();
+    }
+
 }
 
 /* End of file Admin_model.php */

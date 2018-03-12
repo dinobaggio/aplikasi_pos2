@@ -212,6 +212,55 @@ class Admin extends CI_Controller {
 
     }
 
+    public function proses_pembelian () {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $data_barang = json_decode($this->input->post('data_barang'));
+        $data_transaksi = json_decode($this->input->post('data_transaksi'));
+        $beli = array(
+            'total_harga' => $data_transaksi->total_harga,
+            'total_barang' => $data_transaksi->total_barang
+        );
+        $id_transaksi_pembelian = $this->admin_model->transaksi_pembelian($beli);
+        
+        for($i=0;$i<count($data_barang);$i++) {
+            $data_produsen = $data_barang[$i];
+            for($j=0;$j<count($data_produsen);$j++) {
+                $barang = $data_produsen[$j];
+                $beli = array(
+                    'id_transaksi_pembelian' => $id_transaksi_pembelian,
+                    'id_barang' => $barang->id_barang,
+                    'id_produsen' => $barang->id_produsen,
+                    'jumlah_barang' => $barang->jumlah_barang,
+                    'jumlah_harga' => $barang->jumlah_harga
+                );
+                $tugas = $this->admin_model->pembelian($beli);
+                //print_r($barang);
+            }
+        }
+
+        $sukses = new stdClass();
+        $sukses->id_transaksi_pembelian = $id_transaksi_pembelian;
+        $sukses->sukses = true;
+        $sukses = json_encode($sukses);
+        echo $sukses;
+        
+    }
+
+    public function transaksi_sukses () {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        
+        $data['title'] = 'Sukses melakukan transaksi';
+        if ($this->input->get('id_transaksi_pembelian')) {
+            $data['id_transaksi_pembelian'] = $this->input->get('id_transaksi_pembelian');
+        } else {
+            $data['id_transaksi_pembelian'] = 0;
+        }
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/tambah_pembelian/v_transaksi_sukses', $data);
+        $this->load->view('admin/template/footer', $data);
+    }
+
     public function detail_barang_beli ($string) {
         $string = explode('produsen', $string);
         $id_produsen = $string[1];
