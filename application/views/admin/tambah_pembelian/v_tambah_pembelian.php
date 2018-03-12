@@ -1,4 +1,6 @@
 <div id='tambah_pembelian' align="center" class='container'>
+<h3>Pembelian barang</h3>
+<p>pilih produsen lalu pilih barang yang ingin dibeli</p>
 
     <table class='table-bordered'>
         <tr><td colspan='2' align='center'><h4><?= $title ?></h4></td></tr>
@@ -41,17 +43,22 @@ let vm = new Vue({
             let jumlah_barang = 0;
             let el_proses = $("#proses_barang");
             if (keranjang != null) {
+                // pengacekan localStorage.keranjang array atau bukan
                 if (keranjang[0] =='[' && keranjang[keranjang.length-1] == ']') {
                     keranjang = JSON.parse(keranjang);
+                    // memfilter index dengan nilai kosong pada keranjang
                     let filter = keranjang.filter(function (keranjang) {
                         return keranjang != null;
                     });
+                    // pengecekan bahwasannya keranjang yang telah di filter tidak kosong
                     if (filter[0] != null) {
+                        // mem memfilter data didalam keranajang[produsen][barang]
                         for (let i=0;i<filter.length;i++) {
                             let data_produsen = filter[i].filter(function(data){
                                 return data != null;
                             });
                             let produsen_string = JSON.stringify(data_produsen);
+                            // memastikan data barang berupa array
                             if (produsen_string[0] == '[' && produsen_string[produsen_string.length-1] == ']') {
                                 for (let i=0;i<data_produsen.length;i++) {
                                     let el_select = $("#produsen"+data_produsen[i].id_produsen);
@@ -59,9 +66,7 @@ let vm = new Vue({
                                 }
                                 jumlah_barang += data_produsen.length;
                             }
-                            
                         }
-                        
                         el_proses.attr('disabled', false);
                         this.button_proses = 'Proses Keranjang (' +jumlah_barang+')';
                     }
