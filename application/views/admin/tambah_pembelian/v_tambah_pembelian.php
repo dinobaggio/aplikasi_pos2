@@ -10,11 +10,12 @@
             <td>{{produsen.nama_produsen}}</td> 
             <td><a v-bind:href="'<?= base_url('admin/tambah_pembelian/') ?>' + produsen.id_produsen"
             class="btn btn-success btn-sm">Pilih</a></td>
+            <td v-bind:id="'produsen'+produsen.id_produsen"></td>
         </tr>
 
-        <tr v-if='table_keranjang' >
+        <tr>
             <td colspan='2' align='center'>
-                <button class='btn btn-success btn-sm'>{{button_proses}}</button>
+                <button id="proses_barang" class='btn btn-success btn-sm'>{{button_proses}}</button>
                 <button v-on:click="clear()" class='btn btn-danger btn-sm'>Clear</button>
             </td>
         </tr>
@@ -26,16 +27,19 @@
 <script>
 
 let data_produsen = <?= $data_produsen ?>;
+let el_proses = $("#proses_barang");
+
 let vm = new Vue({
     el : "#tambah_pembelian",
     data: {
         data_produsen : data_produsen,
-        button_proses : 'Proses Keranjang',
-        table_keranjang : false
+        button_proses : 'Proses Keranjang'
     },
     methods : {
         cek_keranjang : function () {
             let keranjang = localStorage.keranjang;
+            let jumlah_barang = 0;
+            let el_proses = $("#proses_barang");
             if (keranjang != null) {
                 if (keranjang[0] =='[' && keranjang[keranjang.length-1] == ']') {
                     keranjang = JSON.parse(keranjang);
@@ -43,19 +47,33 @@ let vm = new Vue({
                         return keranjang != null;
                     });
                     if (filter[0] != null) {
+                        for (let i=0;i<filter.length;i++) {
+                            let data_produsen = filter[i].filter(function(data){
+                                return data != null;
+                            });
+                            let produsen_string = JSON.stringify(data_produsen);
+                            if (produsen_string[0] == '[' && produsen_string[produsen_string.length-1] == ']') {
+                                for (let i=0;i<data_produsen.length;i++) {
+                                    let el_select = $("#produsen"+data_produsen[i].id_produsen);
+                                    el_select.html('selected('+data_produsen.length+')');
+                                }
+                                jumlah_barang += data_produsen.length;
+                            }
+                            
+                        }
                         
-                        this.table_keranjang = true;
-                        this.button_proses = 'Proses Keranjang (' +filter.length+')';
+                        el_proses.attr('disabled', false);
+                        this.button_proses = 'Proses Keranjang (' +jumlah_barang+')';
                     }
                 }
             } else {
-                this.table_keranjang = false;
+                el_proses.attr('disabled', true);
                 this.button_proses = "Proses Keranjang";
             }
         },
         clear : function () {
             localStorage.removeItem('keranjang');
-            this.cek_keranjang();
+            window.open("<?= base_url('admin/tambah_pembelian') ?>", "_self");
         }
     }
 });
