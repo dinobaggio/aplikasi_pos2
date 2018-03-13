@@ -303,6 +303,31 @@ class Admin extends CI_Controller {
 
     }
 
+    public function record_pembelian () {
+
+        $data['title'] = "Record Pembelian";
+        $data['data_transaksi'] = $this->admin_model->data_transaksi();
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/record_pembelian/v_record_pembelian', $data);
+        $this->load->view('admin/template/footer', $data);
+        
+    }
+
+    public function detail_transaksi () {
+        $id_transaksi = $this->input->post('id_transaksi_pembelian');
+        if ($id_transaksi) {
+            $data['title'] = "Detail Transaksi";
+            $data['data_transaksi'] = $this->admin_model->detail_transaksi($id_transaksi);
+            $data['id_transaksi'] = $id_transaksi;
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/record_pembelian/v_detail_transaksi', $data);
+            $this->load->view('admin/template/footer', $data);
+        } else {
+            echo "transaksi tidak diketahui";
+        }
+    }
+
     private function data_form_tambah_barang ($value) {
         $data['form_att'] = array(
             'id' => 'form_tambah_barang'

@@ -17,6 +17,7 @@
             <a class="navbar-brand" href="<?= base_url('admin/list_produsen')?>">List Produsen</a>
             <a class="navbar-brand" href="<?= base_url('admin/tambah_barang')?>">Tambah Barang</a>
             <a class="navbar-brand" href="<?= base_url('admin/tambah_produsen')?>">Tambah Produsen</a>
+            <a class="navbar-brand" href="<?= base_url('admin/record_pembelian')?>">Record Pembelian</a>
             <a class="navbar-brand" href="<?= base_url('user/logout')?>">Logout</a>
         <?php endif; ?>
     </span>

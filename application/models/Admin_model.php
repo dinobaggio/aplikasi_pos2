@@ -93,7 +93,7 @@ class Admin_model extends CI_Model {
         $this->db->insert('transaksi_pembelian', $data);
         return $this->db->insert_id();
     }
-
+    //insert kedalam tabel pembelian
     public function pembelian ($beli) {
         $data = array(
             'id_transaksi_pembelian' => $beli['id_transaksi_pembelian'],
@@ -105,6 +105,30 @@ class Admin_model extends CI_Model {
         );
         $this->db->insert('pembelian', $data);
         return $this->db->insert_id();
+    }
+
+    public function data_transaksi () {
+        $query = $this->db->get('transaksi_pembelian');
+        return $query->result_object();
+    }
+
+    public function detail_transaksi($id_transaksi) {
+        $this->db->select("
+            barang.nama_barang,
+            barang.harga_beli,
+            pembelian.jumlah_barang,
+            pembelian.jumlah_harga,
+            produsen.nama_produsen
+        ");
+        $this->db->from("pembelian");
+        $this->db->join("barang", "pembelian.id_barang = barang.id_barang");
+        $this->db->join("produsen", "pembelian.id_produsen = produsen.id_produsen");
+        $this->db->where(array(
+            'pembelian.id_transaksi_pembelian' => $id_transaksi
+        ));
+        $query = $this->db->get();
+        return $query->result_object();
+        
     }
 
 }
