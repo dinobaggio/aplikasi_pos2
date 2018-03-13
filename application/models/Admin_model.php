@@ -108,7 +108,9 @@ class Admin_model extends CI_Model {
     }
 
     public function data_transaksi () {
-        $query = $this->db->get('transaksi_pembelian');
+        $this->db->select("*");
+        $this->db->from("transaksi_pembelian");
+        $query = $this->db->get();
         return $query->result_object();
     }
 
@@ -125,6 +127,23 @@ class Admin_model extends CI_Model {
         $this->db->join("produsen", "pembelian.id_produsen = produsen.id_produsen");
         $this->db->where(array(
             'pembelian.id_transaksi_pembelian' => $id_transaksi
+        ));
+        $query = $this->db->get();
+        return $query->result_object();
+        
+    }
+
+    public function laporan_bulanan($bulan) {
+        $this->db->select("
+            transaksi_pembelian.id_transaksi_pembelian,
+            transaksi_pembelian.created,
+            transaksi_pembelian.total_barang,
+            transaksi_pembelian.total_harga
+        ");
+        $this->db->from("transaksi_pembelian");
+        $this->db->where(array(
+            'MONTH(transaksi_pembelian.created)' => $bulan,
+            'YEAR(transaksi_pembelian.created)' => 2018
         ));
         $query = $this->db->get();
         return $query->result_object();

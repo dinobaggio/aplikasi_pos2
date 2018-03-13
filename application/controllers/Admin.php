@@ -328,6 +328,36 @@ class Admin extends CI_Controller {
         }
     }
 
+    public function laporan_pembelian() {
+        $bulan = $this->input->get('bulan');
+        $data['title'] = "Laporan Pembelian";
+        if (empty($bulan) && empty($tahun)) {
+            
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/laporan_pembelian/v_laporan_pembelian', $data);
+            $this->load->view('admin/template/footer', $data);
+
+        } else {
+            $data['laporan'] = $this->admin_model->laporan_bulanan($bulan);
+
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/laporan_pembelian/v_laporan_pembelian', $data);
+            $this->load->view('admin/template/footer', $data);
+        }
+        
+    }
+
+    public function laporan_pembelian_barang() {
+        $id_transaksi_pembelian = $this->input->post('id_transaksi_pembelian');
+        if (isset($id_transaksi_pembelian)) {
+            $data['barang'] = $this->admin_model->detail_transaksi($id_transaksi_pembelian);
+            //$this->load->view('admin/laporan_pembelian/v_barang_laporan', $data);
+            echo json_encode($data['barang']);
+        } else {
+            echo 'id tidak diketahui';
+        }
+    }
+
     private function data_form_tambah_barang ($value) {
         $data['form_att'] = array(
             'id' => 'form_tambah_barang'
