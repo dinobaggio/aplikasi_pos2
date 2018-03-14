@@ -8,9 +8,10 @@ class Admin extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model("user_model");
-        $this->load->helper('user'); // ini helper home made
         $this->load->model('admin_model');
+        $this->load->library('pdfgenerator');
+        $this->load->helper('user'); // ini helper home made
+        
         
     }
     
@@ -41,6 +42,7 @@ class Admin extends CI_Controller {
                 array($this->admin_model, 'cek_id_produsen')
             )
         ));
+        
         $this->form_validation->set_rules('nama_barang', 'Nama Barang', 'required');
         $this->form_validation->set_rules('stok_barang', 'Stok Barang', 'trim|required|numeric');
         $this->form_validation->set_rules('harga_jual', 'Harga Jual', 'trim|required|numeric');
@@ -304,6 +306,7 @@ class Admin extends CI_Controller {
     }
 
     public function record_pembelian () {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
 
         $data['title'] = "Record Pembelian";
         $data['data_transaksi'] = $this->admin_model->data_transaksi();
@@ -315,6 +318,8 @@ class Admin extends CI_Controller {
     }
 
     public function detail_transaksi () {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
         $id_transaksi = $this->input->post('id_transaksi_pembelian');
         if ($id_transaksi) {
             $data['title'] = "Detail Transaksi";
@@ -329,15 +334,19 @@ class Admin extends CI_Controller {
     }
 
     public function laporan_pembelian() {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
         $bulan = $this->input->get('bulan');
         $data['title'] = "Laporan Pembelian";
-        if (empty($bulan) && empty($tahun)) {
+
+        if (empty($bulan)) {
             
             $this->load->view('admin/template/header', $data);
             $this->load->view('admin/laporan_pembelian/v_laporan_pembelian', $data);
             $this->load->view('admin/template/footer', $data);
 
         } else {
+            $data['bulan'] = $bulan;
             $data['laporan'] = $this->admin_model->laporan_bulanan($bulan);
 
             $this->load->view('admin/template/header', $data);
@@ -348,14 +357,33 @@ class Admin extends CI_Controller {
     }
 
     public function laporan_pembelian_barang() {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        
         $id_transaksi_pembelian = $this->input->post('id_transaksi_pembelian');
+        
         if (isset($id_transaksi_pembelian)) {
             $data['barang'] = $this->admin_model->detail_transaksi($id_transaksi_pembelian);
-            //$this->load->view('admin/laporan_pembelian/v_barang_laporan', $data);
             echo json_encode($data['barang']);
         } else {
             echo 'id tidak diketahui';
         }
+    }
+
+    public function cetak_laporan_pembelian(){
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $bulan = $this->input->post("bulan");
+        if (isset($bulan)) {
+
+            $data['laporan'] = $this->admin_model->laporan_bulanan($bulan);
+
+            $html = $this->load->view('admin/laporan_pembelian/v_cetak', $data, TRUE);
+
+            $this->pdfgenerator->generate($html,'contoh');
+
+        } else {
+            echo "tidak ada data";
+        }
+
     }
 
     private function data_form_tambah_barang ($value) {

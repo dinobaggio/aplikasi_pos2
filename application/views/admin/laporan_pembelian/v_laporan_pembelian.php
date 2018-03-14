@@ -1,6 +1,9 @@
 <div id="laporan_pembelian">
+
+<p>data tercatat secara dinamis, untuk sekarang Hanya maret yang ada datanya</p>
+
     <form action="<?= base_url('admin/laporan_pembelian') ?>" method="GET">
-        <table>
+        <table align="center">
             <tr>
                 <th>Masukan</th>
                 <td>: Bulan 
@@ -26,41 +29,43 @@
             </tr>
             <tr><td></tr>
         </table>
-            <br>
-            <br>
+    </form>
+        <br>
 
+    <table   align='center'>
         <?php 
-        if (!empty($laporan)) :
-        foreach ($laporan as $data) : 
+        if (!empty($laporan)) : ?>
+        
+        <tr><td><button class="btn btn-success" onclick="cetak(<?= $bulan ?>)">Cetak</button></td></tr>
+        
+
+        <?php foreach ($laporan as $data) : 
             $id_transaksi = $data->id_transaksi_pembelian;
-            
             ?>    
-        <table  class='table-bordered'>
-            <tbody id='barang<?= $id_transaksi ?>'>
+            
+            <tbody >
                 <tr>
                     <td colspan='5'><b>ID transaksi:</b> <?= $id_transaksi ?></td>
                 </tr>
                 <tr>
                     <td colspan='5'><b>Tanggal buat:</b> <?= $data->created ?></td>
                 </tr>
-                <tr>
+                <tr id='barang<?= $id_transaksi ?>'>
                     <th>Nama Barang</th>
                     <th>Harga Beli</th>
                     <th>Jumlah Barang</th>
                     <th>Jumlah Harga</th>
                     <th>Nama Produsen</th>
                 </tr>
-                <tr></tr>
-                <!-- before child 2 -->
                 <tr>
                     <td colspan='5'><b>Total Barang:</b> <?= $data->total_barang ?></td>
                 </tr>
                 <tr>
                     <td colspan='5'><b>Total Harga:</b> <?= $data->total_harga ?></td>
                 </tr>
+                <tr><td colspan='5' ><br></td></tr>
             </tbody>
-        </table>
-        <br>
+        
         <script>
             let barang<?= $id_transaksi ?> = document.getElementById("barang<?= $id_transaksi ?>");
             
@@ -68,37 +73,23 @@
                 id_transaksi_pembelian : <?= $id_transaksi ?>
             }, function (data) {
                 let barang = JSON.parse(data);
-                let node = 2;
-                console.log(barang);
                 for (let i=0; i<barang.length;i++) {
-                    let newTr = document.createElement('tr');
-                    let namaTd = document.createElement('td');
-                    let hargaTd = document.createElement('td');
-                    let jumlah_barangTd = document.createElement('td');
-                    let jumlah_hargaTd = document.createElement('td');
-                    let produsenTd = document.createElement('td');
                     
-                    let namaTxt = document.createTextNode(barang[i].nama_barang);
-                    let hargaTxt = document.createTextNode(barang[i].harga_beli);
-                    let jumlah_barangTxt = document.createTextNode(barang[i].jumlah_barang);
-                    let jumlah_hargaTxt = document.createTextNode(barang[i].jumlah_harga);
-                    let produsenTxt = document.createTextNode(barang[i].nama_produsen);
+                    let nama = $("<td></td>").text(barang[i].nama_barang);
+                    let harga = $("<td></td>").text(barang[i].harga_beli);
+                    let jumlah_barang = $("<td></td>").text(barang[i].jumlah_barang);;
+                    let jumlah_harga = $("<td></td>").text(barang[i].jumlah_harga);
+                    let produsen = $("<td></td>").text(barang[i].nama_produsen);
 
-                    namaTd.appendChild(namaTxt);
-                    hargaTd.appendChild(hargaTxt);
-                    jumlah_barangTd.appendChild(jumlah_barangTxt);
-                    jumlah_hargaTd.appendChild(jumlah_hargaTxt);
-                    produsenTd.appendChild(produsenTxt);
+                    let newTr = $("<tr></tr>").append(
+                        nama,
+                        harga,
+                        jumlah_barang,
+                        jumlah_harga,
+                        produsen
+                    );
 
-                    newTr.appendChild(namaTd);
-                    newTr.appendChild(hargaTd);
-                    newTr.appendChild(jumlah_barangTd);
-                    newTr.appendChild(jumlah_hargaTd);
-                    newTr.appendChild(produsenTd);
-
-                    console.log();
-                    barang<?= $id_transaksi ?>.insertBefore(newTr, barang<?= $id_transaksi ?>.childNodes[8] );
-                    node++;
+                    $("#barang<?= $id_transaksi ?>").after(newTr);
                 }
 
             });
@@ -107,6 +98,18 @@
             
             endforeach; 
         endif;?>
-    </form>
+
+        </table>
+    
 </div>
 
+
+<script>
+
+function cetak (bulan) {
+    $.post("<?= base_url('admin/cetak_laporan_pembelian') ?>", {
+        bulan : bulan
+    });
+}
+
+</script>
