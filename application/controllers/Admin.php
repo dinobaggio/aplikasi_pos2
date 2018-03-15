@@ -54,72 +54,53 @@ class Admin extends CI_Controller {
             'numeric' => '* {field} Harus angka',
             'value_produsen' => '* {field} Harus dipilih'
         ));
+        $kosong = '';
+        $id_produsen = $this->input->post("id_produsen");
+        $nama_barang = $this->input->post("nama_barang");
+        $stok_barang = $this->input->post("stok_barang");
+        $harga_jual = $this->input->post("harga_jual");
+        $harga_beli = $this->input->post("harga_beli");
+        
 
         $ray = array(
-            'id_produsen' => $this->input->post('id_produsen'),
-            'nama_barang' => $this->input->post('nama_barang'),
-            'stok_barang' => $this->input->post('stok_barang'),
-            'harga_jual' => $this->input->post('harga_jual'),
-            'harga_beli' => $this->input->post('harga_beli')
+            'id_produsen' => $id_produsen,
+            'nama_barang' => $nama_barang,
+            'stok_barang' => $stok_barang,
+            'harga_jual' => $harga_jual,
+            'harga_beli' => $harga_beli
         );
 
         if ($this->form_validation->run() == false ) {
-            
             $value = $this->exists_value_tambah_barang($ray);
             $data = $this->data_form_tambah_barang($value);
             $data['title'] = "Tambah Barang";
-            $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/tambah_barang/v_tambah_barang_form', $data);
-            $this->load->view('admin/template/footer', $data);
-
         } else {
+            $tugas = $this->admin_model->tambah_barang($ray);
 
             $ray = array(
-                'id_produsen' => $this->input->post('id_produsen'),
-                'nama_barang' => $this->input->post('nama_barang'),
-                'stok_barang' => $this->input->post('stok_barang'),
-                'harga_jual' => $this->input->post('harga_jual'),
-                'harga_beli' => $this->input->post('harga_beli')
+                'id_produsen' => $kosong,
+                'nama_barang' => $kosong,
+                'stok_barang' => $kosong,
+                'harga_jual' => $kosong,
+                'harga_beli' => $kosong
             );
-            $tugas = $this->admin_model->tambah_barang($ray);
+            
             if ($tugas) {
-                $ray = array(
-                    'id_produsen' => '',
-                    'nama_barang' => '',
-                    'stok_barang' => '',
-                    'harga_jual' => '',
-                    'harga_beli' => ''
-                );
-
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
-                
                 $data['title'] = "Tambah Barang Sukses";
-                $this->load->view('admin/template/header', $data);
-                $this->load->view('admin/tambah_barang/v_tambah_barang_form', $data);
-                $this->load->view('admin/template/footer', $data);
 
             } else {
-
-                $ray = array(
-                    'id_produsen' => '',
-                    'nama_barang' => '',
-                    'stok_barang' => '',
-                    'harga_jual' => '',
-                    'harga_beli' => ''
-                );
-                
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
-                
                 $data['title'] = "Tambah Barang Gagal";
-                $this->load->view('admin/template/header', $data);
-                $this->load->view('admin/tambah_barang/v_tambah_barang_form', $data);
-                $this->load->view('admin/template/footer', $data);
-
             }
 
         }
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/tambah_barang/v_tambah_barang_form', $data);
+        $this->load->view('admin/template/footer', $data);
         
         
     }
@@ -132,61 +113,40 @@ class Admin extends CI_Controller {
             'required' => '* {field} harap diisi'
         ));
 
-        if ($this->form_validation->run() == false) {
+        $nama_produsen = $this->input->post('nama_produsen');
+        $kosong = '';
 
-            $ray = array(
-                'nama_produsen' => $this->input->post('nama_produsen')
-            );
-    
+        $ray = array(
+            'nama_produsen' => $nama_produsen
+        );
+
+
+        if ($this->form_validation->run() == false) {
             $value = $this->exists_value_tambah_produsen($ray);
             $data = $this->data_form_tambah_produsen($value);
-    
             $data['title'] = "Tambah Produsen";
-    
-            $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
-            $this->load->view('admin/template/footer', $data);
 
         } else {
+            $tugas = $this->admin_model->tambah_produsen($ray);
             $ray = array(
-                'nama_produsen' => $this->input->post('nama_produsen')
+                'nama_produsen' => $kosong
             );
 
-            $tugas = $this->admin_model->tambah_produsen($ray);
             if ($tugas) {
-
-                $ray = array(
-                    'nama_produsen' => ''
-                );
-
                 $value = $this->exists_value_tambah_produsen($ray);
                 $data = $this->data_form_tambah_produsen($value);
-        
                 $data['title'] = "Sukses Menambah Produsen";
         
-                $this->load->view('admin/template/header', $data);
-                $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
-                $this->load->view('admin/template/footer', $data);
-
             } else {
-
-                $ray = array(
-                    'nama_produsen' => ''
-                );
-
                 $value = $this->exists_value_tambah_produsen($ray);
                 $data = $this->data_form_tambah_produsen($value);
-        
                 $data['title'] = "Gagal Menambah Produsen";
-        
-                $this->load->view('admin/template/header', $data);
-                $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
-                $this->load->view('admin/template/footer', $data);
-
             }
-    
-            
         }
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/tambah_produsen/v_tambah_produsen_form', $data);
+        $this->load->view('admin/template/footer', $data);
 
         
 
@@ -194,30 +154,33 @@ class Admin extends CI_Controller {
 
     public function tambah_pembelian ($id_produsen = false) {
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $file ='';
 
         if ($id_produsen == false) {
             $data['title'] = "Pilih Produsen";
             $data['data_produsen'] = json_encode($this->admin_model->list_produsen());
-            
-            $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/tambah_pembelian/v_tambah_pembelian', $data);
-            $this->load->view('admin/template/footer', $data);
+            $file = 'v_tambah_pembelian';
         } else {
             $data['title'] = "Pilih barang";
             $data['data_barang'] = json_encode($this->admin_model->produsen_barang($id_produsen));
             $data['id_produsen'] = $id_produsen;
-            
-            $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/tambah_pembelian/v_list_barang', $data);
-            $this->load->view('admin/template/footer', $data);
+            $file = 'v_list_barang';
         }
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/tambah_pembelian/'.$file, $data);
+        $this->load->view('admin/template/footer', $data);
 
     }
 
     public function proses_pembelian () {
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
-        $data_barang = json_decode($this->input->post('data_barang'));
-        $data_transaksi = json_decode($this->input->post('data_transaksi'));
+        $data_barang = $this->input->post('data_barang');
+        $data_transaksi = $this->input->post('data_transaksi');
+
+        $data_barang = json_decode($data_barang);
+        $data_transaksi = json_decode($data_transaksi);
+        
         $beli = array(
             'total_harga' => $data_transaksi->total_harga,
             'total_barang' => $data_transaksi->total_barang
@@ -225,18 +188,25 @@ class Admin extends CI_Controller {
         $id_transaksi_pembelian = $this->admin_model->transaksi_pembelian($beli);
         
         for($i=0;$i<count($data_barang);$i++) {
+
             $data_produsen = $data_barang[$i];
+
             for($j=0;$j<count($data_produsen);$j++) {
                 $barang = $data_produsen[$j];
+                $id_barang = $barang->id_barang;
+                $id_produsen = $barang->id_produsen;
+                $jumlah_barang = $barang->jumlah_barang;
+                $jumlah_harga = $barang->jumlah_harga;
+
                 $beli = array(
                     'id_transaksi_pembelian' => $id_transaksi_pembelian,
-                    'id_barang' => $barang->id_barang,
-                    'id_produsen' => $barang->id_produsen,
-                    'jumlah_barang' => $barang->jumlah_barang,
-                    'jumlah_harga' => $barang->jumlah_harga
+                    'id_barang' => $id_barang,
+                    'id_produsen' => $id_produsen,
+                    'jumlah_barang' => $jumlah_barang,
+                    'jumlah_harga' => $jumlah_harga
                 );
+
                 $tugas = $this->admin_model->pembelian($beli);
-                //print_r($barang);
             }
         }
 
@@ -373,12 +343,55 @@ class Admin extends CI_Controller {
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
         $bulan = $this->input->post("bulan");
         if (isset($bulan)) {
-
             $data['laporan'] = $this->admin_model->laporan_bulanan($bulan);
+
+            switch ($bulan) {
+                case 1:
+                    $bulan = 'januari';
+                    break;
+                case 2:
+                    $bulan = 'februari';
+                    break;
+                case 3:
+                    $bulan = 'maret';
+                    break;
+                case 4:
+                    $bulan = 'april';
+                    break;
+                case 5:
+                    $bulan = 'maret';
+                    break;
+                case 6:
+                    $bulan = 'juni';
+                    break;
+                case 7:
+                    $bulan = 'juli';
+                    break;
+                case 8:
+                    $bulan = 'agustus';
+                    break;
+                case 9:
+                    $bulan = 'september';
+                    break;
+                case 10:
+                    $bulan = 'oktober';
+                    break;
+                case 11:
+                    $bulan = 'november';
+                    break;
+                case 12:
+                    $bulan = 'desember';
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+
+            
 
             $html = $this->load->view('admin/laporan_pembelian/v_cetak', $data, TRUE);
 
-            $this->pdfgenerator->generate($html,'contoh');
+            $this->pdfgenerator->generate($html,'laporan_pembelian_bulan_'.$bulan);
 
         } else {
             echo "tidak ada data";

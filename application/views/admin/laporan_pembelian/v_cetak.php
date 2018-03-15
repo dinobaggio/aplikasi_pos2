@@ -97,7 +97,6 @@
             </thead>
         </table>
         <br>
-        
         <?php endforeach; ?>
     </div>
     
