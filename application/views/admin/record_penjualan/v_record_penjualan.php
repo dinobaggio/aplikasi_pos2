@@ -1,10 +1,11 @@
 <div id='record_pembelian' align="center" class='container'>
-<h3>Record pembelian</h3>
+<h3>Record Penjualan</h3>
 
     
     <table class='table-bordered'>
     <tr>
-        <th>ID</th>
+        <th>ID Penjualan</th>
+        <th>ID User</th>
         <th>Total Barang</th>
         <th>Total Harga Beli</th>
         <th>Total Harga Jual</th>
@@ -14,7 +15,8 @@
     
     <?php foreach ($data_transaksi as $data) : ?>
     <tr>
-        <td>#<?= $data->id_transaksi_pembelian ?></td>
+        <td>#<?= $data->id_transaksi_penjualan ?></td>
+        <td>#<?= $data->id_user ?></td>
         <td><?= $data->total_barang ?></td>
         <td><?= $data->total_harga_beli ?></td>
         <td><?= $data->total_harga_jual ?></td>
@@ -22,12 +24,9 @@
             $date = strtotime($data->created);
             echo date("Y-m-d h:i:s", $date);
         ?></td>
-        <?= form_open(base_url('admin/detail_transaksi_pembelian'))?>
         <td>
-            <?= form_input(array('value'=>$data->id_transaksi_pembelian, 'type'=>'hidden', 'name'=>'id_transaksi_pembelian')); ?>
-            <?= form_submit(array('value'=>'Detail')) ?>
+            <a href="<?= base_url('admin/detail_transaksi_penjualan/') . $data->id_transaksi_penjualan?>" class="btn btn-info btn-sm">Detail</a>
         </td>
-        <?= form_close(); ?>
     </tr>
     <?php endforeach; ?>
 

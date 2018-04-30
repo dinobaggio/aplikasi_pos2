@@ -53,13 +53,19 @@
     <div id="outtable">
     <?php
     foreach ($laporan as $data) : 
-            $id_transaksi = $data->id_transaksi_pembelian;
+            $id_transaksi = $data->id_transaksi_penjualan;
             ?>  
         <table>
             <thead>
             <tr>
                 <td colspan='5'><b>ID transaksi:</b> <?= $id_transaksi ?></td>
             </tr>
+            <tr>
+                    <td><b>Nama Pelanggan:</b> <?= $data->nama_pelanggan ?></td>
+                </tr>
+                <tr>
+                    <td><b>ID Pelanggan:</b> #<?= $data->id_user ?></td>
+                </tr>
             <tr>
                 <td colspan='5'><b>Tanggal buat:</b> <?= $data->created ?></td>
             </tr>
@@ -73,12 +79,12 @@
             </thead>
             <tbody>
             <?php 
-                $list_barang = $this->admin_model->detail_transaksi_pembelian($id_transaksi);
+                $list_barang = $this->admin_model->detail_transaksi_penjualan($id_transaksi);
                 foreach ($list_barang as $barang) :
             ?>
                     <tr>
                     <td><?= $barang->nama_barang ?></td>
-                    <td><?= $barang->harga_beli ?></td>
+                    <td><?= $barang->harga_jual ?></td>
                     <td><?= $barang->jumlah_barang ?></td>
                     <td><?= $barang->jumlah_harga ?></td>
                     <td><?= $barang->nama_produsen ?></td>

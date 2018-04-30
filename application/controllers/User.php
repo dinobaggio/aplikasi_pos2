@@ -56,9 +56,7 @@ class User extends CI_Controller {
             
             $data = $this->data_form_login($value);
             $data['title'] = "Form Login";
-            $this->load->view('user/template/header', $data);
-            $this->load->view('user/login/v_login_form', $data);
-            $this->load->view('user/template/footer', $data);
+            
         } else {
             $username = $this->input->post('username');
             $password = $this->input->post('password');
@@ -91,10 +89,6 @@ class User extends CI_Controller {
                         $data = $this->data_form_login($value);
                         $data['title'] = "Form Login";
                         $data['error'] = '* Kesalahan ketika login';
-                        $this->load->view('user/template/header', $data);
-                        $this->load->view('user/login/v_login_form', $data);
-                        $this->load->view('user/template/footer', $data);
-
                     }
                 } else {
                     $id_user = $this->user_model->cek_id_username($username);
@@ -113,12 +107,13 @@ class User extends CI_Controller {
                 $data = $this->data_form_login($value);
                 $data['title'] = "Form Login";
                 $data['error_password'] = '* Password salah';
-                $this->load->view('user/template/header', $data);
-                $this->load->view('user/login/v_login_form', $data);
-                $this->load->view('user/template/footer', $data);
             }
             
         }
+
+        $this->load->view('user/template/header', $data);
+        $this->load->view('user/login/v_login_form', $data);
+        $this->load->view('user/template/footer', $data);
         
     }
 
@@ -157,29 +152,29 @@ class User extends CI_Controller {
             
             $data = $this->data_form_register($value);
             $data['title'] = "Form Register";
-            $this->load->view('user/template/header', $data);
-            $this->load->view('user/register/v_register_form', $data);
-            $this->load->view('user/template/footer', $data);
+            
         } else {
             $username = $this->input->post('username');
             $password = $this->input->post('password');
             $confirm_pw = $this->input->post('confirm_pw');
             $tugas = $this->user_model->create_user($username, $password);
             if ($tugas) {
+                $value = $this->exists_inputan_register('', '', '');
+                $data = $this->data_form_register($value);
                 $data['title'] = "Registrasi Sukses";
-                $this->load->view('user/template/header', $data);
-                $this->load->view( 'user/register/v_register_sukses', $data);
-                $this->load->view('user/template/footer', $data);
+                
             } else {
                 $value = $this->exists_inputan_register($username, $password, $confirm_pw);
                 $data = $this->data_form_register($value);
                 $data['error'] = "* Error ketika mendaftarkan user!";
                 $data['title'] = "Form Register";
-                $this->load->view('user/template/header', $data);
-                $this->load->view('user/register/v_register_form', $data);
-                $this->load->view('user/template/footer', $data);
+                
             }
         }
+
+        $this->load->view('user/template/header', $data);
+        $this->load->view('user/register/v_register_form', $data);
+        $this->load->view('user/template/footer', $data);
         
 
     }

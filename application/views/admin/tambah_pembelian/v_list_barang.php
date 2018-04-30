@@ -1,9 +1,8 @@
-<div id='list_barang_produsen' align="center" class='container'>
-<h3><?= $title ?></h3>
-    <table class='table-bordered'>
-        <tr>
-            <th colspan='3'><a href="<?= base_url('admin/tambah_pembelian') ?>" class="btn btn-info btn-sm">Back</a></th>
-        </tr>
+<h2><?= $title ?></h2>
+<div id='list_barang_produsen' class=''>
+
+    <table class=''>
+        
 
         <tr>
             <th>ID Barang</th>
@@ -19,9 +18,15 @@
             class="btn btn-success btn-sm">Pilih</a></td>  
             <td v-bind:id="'barang'+barang.id_barang" ></td> 
         </tr>
+
+        <tr>
+            <th colspan='3'></th>
+        </tr>
             
     </table>
 
+    <br>   
+    <a href="<?= base_url('admin/tambah_pembelian') ?>" class="btn btn-secondary btn-sm">Back</a>
 
 </div>
 

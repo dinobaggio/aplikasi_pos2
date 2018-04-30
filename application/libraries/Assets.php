@@ -8,8 +8,10 @@ class Assets
         $assets = "";
         $assets .= "<link rel='stylesheet' href='".base_url('../assets/css/paginator.css')."'>";
         $assets .= "<link rel='stylesheet' href='".base_url('../assets/css/bootstrap.min.css')."'>";
+        
         $assets .= "<script src='".base_url('../assets/js/vue.min.js')."'></script>";
         $assets .= "<script src='".base_url('../assets/js/jquery-3.3.1.min.js')."'></script>";
+        $assets .= "<script src='".base_url('../assets/js/bootstrap.bundle.min.js')."'></script>";
         return $assets;
     }
 

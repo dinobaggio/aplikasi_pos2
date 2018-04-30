@@ -67,7 +67,11 @@ class Admin_model extends CI_Model {
     public function get_barang($data) {
         $id_barang = $data['id_barang'];
         $id_produsen = $data['id_produsen'];
-        if ($id_barang != false) {
+        $per_page = $data['per_page'];
+        $start_form = $data['start_form'];
+        
+        if (!empty($id_barang) && !empty($id_produsen)) {
+            
             $this->db->select("
             id_barang,
             nama_barang,
@@ -81,7 +85,24 @@ class Admin_model extends CI_Model {
             ));
             $tugas = $this->db->get();
             return $tugas->row();
+        } else if (!empty($per_page) || !empty($start_from)) {
+            
+            $this->db->select("
+            id_barang,
+            nama_barang,
+            stok_barang,
+            harga_beli,
+            harga_jual");
+            $this->db->limit($per_page, $start_form);
+            $this->db->from('barang');
+            return $this->db->get()->result_object();
         }
+    }
+
+    public function total_barang() {
+        $this->db->select("id_barang");
+        $this->db->from("barang");
+        return $this->db->get()->num_rows();
     }
 
     public function transaksi_pembelian($beli) {
@@ -107,14 +128,22 @@ class Admin_model extends CI_Model {
         return $this->db->insert_id();
     }
 
-    public function data_transaksi () {
+    public function data_transaksi_pembelian ($per_page, $start_from) {
         $this->db->select("*");
         $this->db->from("transaksi_pembelian");
+        $this->db->limit($per_page, $start_from );
         $query = $this->db->get();
         return $query->result_object();
     }
 
-    public function detail_transaksi($id_transaksi) {
+    public function jumlah_record_pembelian () {
+        $this->db->select("*");
+        $this->db->from("transaksi_pembelian");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function detail_transaksi_pembelian($id_transaksi) {
         $this->db->select("
             barang.nama_barang,
             barang.harga_beli,
@@ -133,12 +162,13 @@ class Admin_model extends CI_Model {
         
     }
 
-    public function laporan_bulanan($bulan) {
+    public function laporan_bulanan_pembelian($bulan) {
         $this->db->select("
             transaksi_pembelian.id_transaksi_pembelian,
             transaksi_pembelian.created,
             transaksi_pembelian.total_barang,
-            transaksi_pembelian.total_harga
+            transaksi_pembelian.total_harga_beli,
+            transaksi_pembelian.total_harga_jual
         ");
         $this->db->from("transaksi_pembelian");
         $this->db->where(array(
@@ -148,6 +178,94 @@ class Admin_model extends CI_Model {
         $query = $this->db->get();
         return $query->result_object();
         
+    }
+
+    public function laporan_bulanan_penjualan($bulan) {
+        $this->db->select("
+            transaksi_penjualan.id_transaksi_penjualan,
+            transaksi_penjualan.created,
+            transaksi_penjualan.total_barang,
+            transaksi_penjualan.total_harga_beli,
+            transaksi_penjualan.total_harga_jual,
+            pelanggan.id_user,
+            pelanggan.nama_pelanggan
+        ");
+        $this->db->from("transaksi_penjualan");
+        $this->db->join("pelanggan", "transaksi_penjualan.id_user = pelanggan.id_user");
+        $this->db->where(array(
+            'MONTH(transaksi_penjualan.created)' => $bulan,
+            'YEAR(transaksi_penjualan.created)' => 2018
+        ));
+        $query = $this->db->get();
+        return $query->result_object();
+        
+    }
+
+    public function detail_transaksi_penjualan($id_transaksi) {
+        $this->db->select("
+            barang.nama_barang,
+            barang.harga_jual,
+            penjualan.jumlah_barang,
+            penjualan.jumlah_harga,
+            produsen.nama_produsen
+        ");
+        $this->db->from("penjualan");
+        $this->db->join("barang", "penjualan.id_barang = barang.id_barang");
+        $this->db->join("produsen", "barang.id_produsen = produsen.id_produsen", "left outer");
+        $this->db->where(array(
+            'penjualan.id_transaksi_penjualan' => $id_transaksi
+        ));
+        $query = $this->db->get();
+        return $query->result_object();
+        
+    }
+
+    public function data_transaksi_penjualan ($per_page, $start_form) {
+        $this->db->select("*");
+        $this->db->from("transaksi_penjualan");
+        $this->db->limit($per_page, $start_form );
+        $query = $this->db->get();
+        return $query->result_object();
+    }
+
+    public function jumlah_record_penjualan () {
+        $this->db->select("id_transaksi_penjualan");
+        $this->db->from("transaksi_penjualan");
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    public function get_user ($data){
+        $per_page = $data['per_page'];
+        $start_form = $data['start_form'];
+        $this->db->select("
+        id_user,
+        username,
+        cookie");
+        $this->db->limit($per_page, $start_form);
+        $this->db->from('user');
+        return $this->db->get()->result_object();
+    }
+
+    public function total_user (){
+        $this->db->select("id_user");
+        $this->db->from("user");
+        return $this->db->get()->num_rows();
+    }
+
+    public function pembelian_penjualan($bulan) {
+        if ($bulan) :
+            $tahun = 2018;
+            $que = $this->db->query(
+                "SELECT id_transaksi_pembelian as id, total_barang, total_harga_beli, total_harga_jual, created, kategori from transaksi_pembelian WHERE MONTH(created) = $bulan AND YEAR(created) = $tahun
+                UNION SELECT id_transaksi_penjualan as id, total_barang, total_harga_beli, total_harga_jual, created, kategori from transaksi_penjualan
+                WHERE MONTH(created) = $bulan AND YEAR(created) = $tahun ORDER BY created DESC"
+            );
+            
+            return $que->result_object(); 
+        endif;
+
+        return '';
     }
 
 }

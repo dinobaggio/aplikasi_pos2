@@ -8,9 +8,14 @@ class Admin extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('admin_model');
-        $this->load->library('pdfgenerator');
+        $this->load->model(array('admin_model', 'user_model'));
+        
         $this->load->helper('user'); // ini helper home made
+        $params = array(
+            'perPage' => 10,
+            'instance' => 'halaman'
+        );
+        $this->load->library('paginator', $params);
         
         
     }
@@ -69,6 +74,10 @@ class Admin extends CI_Controller {
             'harga_jual' => $harga_jual,
             'harga_beli' => $harga_beli
         );
+        $data = array(
+            'total_harga'=> ($harga_beli * $stok_barang) ,
+            'total_barang'=> $stok_barang
+        );
 
         if ($this->form_validation->run() == false ) {
             $value = $this->exists_value_tambah_barang($ray);
@@ -76,6 +85,7 @@ class Admin extends CI_Controller {
             $data['title'] = "Tambah Barang";
         } else {
             $tugas = $this->admin_model->tambah_barang($ray);
+            $tugas2 = $this->admin_model->transaksi_pembelian($data);
 
             $ray = array(
                 'id_produsen' => $kosong,
@@ -86,14 +96,20 @@ class Admin extends CI_Controller {
             );
             
             if ($tugas) {
-                $value = $this->exists_value_tambah_barang($ray);
-                $data = $this->data_form_tambah_barang($value);
-                $data['title'] = "Tambah Barang Sukses";
+                if ($tugas2) {
+                    $value = $this->exists_value_tambah_barang($ray);
+                    $data = $this->data_form_tambah_barang($value);
+                    $data['title'] = "Tambah Barang Sukses";
+                }else {
+                    $value = $this->exists_value_tambah_barang($ray);
+                    $data = $this->data_form_tambah_barang($value);
+                    $data['title'] = "Tambah Barang Gagal Tambah Pembelian";
+                }
 
             } else {
                 $value = $this->exists_value_tambah_barang($ray);
                 $data = $this->data_form_tambah_barang($value);
-                $data['title'] = "Tambah Barang Gagal";
+                $data['title'] = "Tambah Barang Gagal Tambah Barang";
             }
 
         }
@@ -103,6 +119,31 @@ class Admin extends CI_Controller {
         $this->load->view('admin/template/footer', $data);
         
         
+    }
+
+    public function list_barang () {
+        $total_barang = $this->admin_model->total_barang();
+        $per_page = $this->paginator->get_perpage();
+        $start_form = $this->paginator->get_start();
+
+        $this->paginator->set_total($total_barang);
+
+        $pagin = array(
+            'id_barang' => '',
+            'id_produsen' => '',
+            'per_page' => $per_page,
+            'start_form' => $start_form
+        );
+
+        $data['all_barang'] = $this->admin_model->get_barang($pagin);
+        $data['page_links'] = $this->paginator->page_links();
+        $data['page'] = $this->paginator->get_page();
+
+        $data['title'] = "List Barang";
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/list_barang/v_list_barang', $data);
+        $this->load->view('admin/template/footer', $data);
     }
 
     public function tambah_produsen ()  {
@@ -157,11 +198,11 @@ class Admin extends CI_Controller {
         $file ='';
 
         if ($id_produsen == false) {
-            $data['title'] = "Pilih Produsen";
+            $data['title'] = "Pembelian barang";
             $data['data_produsen'] = json_encode($this->admin_model->list_produsen());
             $file = 'v_tambah_pembelian';
         } else {
-            $data['title'] = "Pilih barang";
+            $data['title'] = "Pembelian barang";
             $data['data_barang'] = json_encode($this->admin_model->produsen_barang($id_produsen));
             $data['id_produsen'] = $id_produsen;
             $file = 'v_list_barang';
@@ -180,9 +221,9 @@ class Admin extends CI_Controller {
 
         $data_barang = json_decode($data_barang);
         $data_transaksi = json_decode($data_transaksi);
-        
+
         $beli = array(
-            'total_harga' => $data_transaksi->total_harga,
+            'total_harga' => $data_transaksi->total_harga_beli,
             'total_barang' => $data_transaksi->total_barang
         );
         $id_transaksi_pembelian = $this->admin_model->transaksi_pembelian($beli);
@@ -239,7 +280,9 @@ class Admin extends CI_Controller {
         $id_barang = $string[0];
         $barang = array(
             'id_barang' => $id_barang,
-            'id_produsen' => $id_produsen
+            'id_produsen' => $id_produsen,
+            'per_page' => '',
+            'start_form' => ''
         );
         $data['data_barang'] = $this->admin_model->get_barang($barang);
         $data['id_produsen'] = $id_produsen;
@@ -277,9 +320,15 @@ class Admin extends CI_Controller {
 
     public function record_pembelian () {
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $jumlah_record = $this->admin_model->jumlah_record_pembelian();
+        $per_page = $this->paginator->get_perpage();
+        $start_from = $this->paginator->get_start();
+        $this->paginator->set_total($jumlah_record);
 
         $data['title'] = "Record Pembelian";
-        $data['data_transaksi'] = $this->admin_model->data_transaksi();
+        $data['data_transaksi'] = $this->admin_model->data_transaksi_pembelian($per_page, $start_from);
+        $data['page_links'] = $this->paginator->page_links();
+        
 
         $this->load->view('admin/template/header', $data);
         $this->load->view('admin/record_pembelian/v_record_pembelian', $data);
@@ -287,13 +336,13 @@ class Admin extends CI_Controller {
         
     }
 
-    public function detail_transaksi () {
+    public function detail_transaksi_pembelian () {
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
 
         $id_transaksi = $this->input->post('id_transaksi_pembelian');
         if ($id_transaksi) {
             $data['title'] = "Detail Transaksi";
-            $data['data_transaksi'] = $this->admin_model->detail_transaksi($id_transaksi);
+            $data['data_transaksi'] = $this->admin_model->detail_transaksi_pembelian($id_transaksi);
             $data['id_transaksi'] = $id_transaksi;
             $this->load->view('admin/template/header', $data);
             $this->load->view('admin/record_pembelian/v_detail_transaksi', $data);
@@ -309,20 +358,14 @@ class Admin extends CI_Controller {
         $bulan = $this->input->get('bulan');
         $data['title'] = "Laporan Pembelian";
 
-        if (empty($bulan)) {
-            
-            $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/laporan_pembelian/v_laporan_pembelian', $data);
-            $this->load->view('admin/template/footer', $data);
-
-        } else {
+        if (!empty($bulan)) {
             $data['bulan'] = $bulan;
-            $data['laporan'] = $this->admin_model->laporan_bulanan($bulan);
-
-            $this->load->view('admin/template/header', $data);
-            $this->load->view('admin/laporan_pembelian/v_laporan_pembelian', $data);
-            $this->load->view('admin/template/footer', $data);
-        }
+            $data['laporan'] = $this->admin_model->laporan_bulanan_pembelian($bulan);
+        } 
+        
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/laporan_pembelian/v_laporan_pembelian', $data);
+        $this->load->view('admin/template/footer', $data);
         
     }
 
@@ -332,7 +375,7 @@ class Admin extends CI_Controller {
         $id_transaksi_pembelian = $this->input->post('id_transaksi_pembelian');
         
         if (isset($id_transaksi_pembelian)) {
-            $data['barang'] = $this->admin_model->detail_transaksi($id_transaksi_pembelian);
+            $data['barang'] = $this->admin_model->detail_transaksi_pembelian($id_transaksi_pembelian);
             echo json_encode($data['barang']);
         } else {
             echo 'id tidak diketahui';
@@ -340,10 +383,11 @@ class Admin extends CI_Controller {
     }
 
     public function cetak_laporan_pembelian(){
+        $this->load->library('pdfgenerator');
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
         $bulan = $this->input->post("bulan");
         if (isset($bulan)) {
-            $data['laporan'] = $this->admin_model->laporan_bulanan($bulan);
+            $data['laporan'] = $this->admin_model->laporan_bulanan_pembelian($bulan);
 
             switch ($bulan) {
                 case 1:
@@ -387,8 +431,6 @@ class Admin extends CI_Controller {
                     break;
             }
 
-            
-
             $html = $this->load->view('admin/laporan_pembelian/v_cetak', $data, TRUE);
 
             $this->pdfgenerator->generate($html,'laporan_pembelian_bulan_'.$bulan);
@@ -397,6 +439,227 @@ class Admin extends CI_Controller {
             echo "tidak ada data";
         }
 
+    }
+
+    public function laporan_penjualan() {
+
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        $bulan = $this->input->get('bulan');
+        $data['title'] = "Laporan Penjualan";
+
+        if (!empty($bulan)) {
+            $data['bulan'] = $bulan;
+            $data['laporan'] = $this->admin_model->laporan_bulanan_penjualan($bulan);
+        } 
+        
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/laporan_penjualan/v_laporan_penjualan', $data);
+        $this->load->view('admin/template/footer', $data);
+
+    }
+
+    public function laporan_penjualan_barang() {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        
+        $id_transaksi_penjualan = $this->input->post('id_transaksi_penjualan');
+        
+        if (isset($id_transaksi_penjualan)) {
+            $data['barang'] = $this->admin_model->detail_transaksi_penjualan($id_transaksi_penjualan);
+            echo json_encode($data['barang']);
+        } else {
+            echo 'id tidak diketahui';
+        }
+    }
+
+    public function cetak_laporan_penjualan(){
+        $this->load->library('pdfgenerator');
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $bulan = $this->input->post("bulan");
+        if (isset($bulan)) {
+            $data['laporan'] = $this->admin_model->laporan_bulanan_penjualan($bulan);
+
+            switch ($bulan) {
+                case 1:
+                    $bulan = 'januari';
+                    break;
+                case 2:
+                    $bulan = 'februari';
+                    break;
+                case 3:
+                    $bulan = 'maret';
+                    break;
+                case 4:
+                    $bulan = 'april';
+                    break;
+                case 5:
+                    $bulan = 'maret';
+                    break;
+                case 6:
+                    $bulan = 'juni';
+                    break;
+                case 7:
+                    $bulan = 'juli';
+                    break;
+                case 8:
+                    $bulan = 'agustus';
+                    break;
+                case 9:
+                    $bulan = 'september';
+                    break;
+                case 10:
+                    $bulan = 'oktober';
+                    break;
+                case 11:
+                    $bulan = 'november';
+                    break;
+                case 12:
+                    $bulan = 'desember';
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+
+            $html = $this->load->view('admin/laporan_penjualan/v_cetak', $data, TRUE);
+
+            $this->pdfgenerator->generate($html,'laporan_penjualan_bulan_'.$bulan);
+
+        } else {
+            echo "tidak ada data";
+        }
+
+    }
+
+    public function record_penjualan () {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+        $jumlah_record = $this->admin_model->jumlah_record_penjualan();
+        $per_page = $this->paginator->get_perpage();
+        $start_from = $this->paginator->get_start();
+        $this->paginator->set_total($jumlah_record);
+
+        $data['title'] = "Record Penjualan";
+        $data['data_transaksi'] = $this->admin_model->data_transaksi_penjualan($per_page, $start_from);
+        $data['page_links'] = $this->paginator->page_links();
+        
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/record_penjualan/v_record_penjualan', $data);
+        $this->load->view('admin/template/footer', $data);
+        
+    }
+
+    public function detail_transaksi_penjualan ($id_transaksi) {
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        if ($id_transaksi) {
+            $data['title'] = "Detail Transaksi";
+            $data['data_transaksi'] = $this->admin_model->detail_transaksi_penjualan($id_transaksi);
+            $data['id_transaksi'] = $id_transaksi;
+            $this->load->view('admin/template/header', $data);
+            $this->load->view('admin/record_penjualan/v_detail_transaksi', $data);
+            $this->load->view('admin/template/footer', $data);
+        } else {
+            echo "transaksi tidak diketahui";
+        }
+    }
+
+    public function list_user (){
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        $total_user = $this->admin_model->total_user();
+        $per_page = $this->paginator->get_perpage();
+        $start_form = $this->paginator->get_start();
+
+        $this->paginator->set_total($total_user);
+
+        $pagin = array(
+            'per_page' => $per_page,
+            'start_form' => $start_form
+        );
+
+        $data['all_user'] = $this->admin_model->get_user($pagin);
+        $data['page_links'] = $this->paginator->page_links();
+        $data['page'] = $this->paginator->get_page();
+
+        $data['title'] = "List User";
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/list_user/v_list_user', $data);
+        $this->load->view('admin/template/footer', $data);
+    }
+
+    public function tambah_user () {
+
+        cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
+
+        $this->form_validation->set_rules('username', 'Username', array(
+            'trim',
+            'required',
+            'alpha_numeric',
+            array(
+                'username_exists',
+                array($this->user_model, 'username_exists')
+            )
+        ));
+        
+        $this->form_validation->set_rules('password', 'Password', 'trim|required');
+        $this->form_validation->set_rules('confirm_pw', 'Konfirmasi Password', 'trim|required|matches[password]');
+
+        $this->form_validation->set_message(array(
+            'username_exists' => '* {field} Sudah ada',
+            'required' => '* {field} Harap diisi',
+            'matches' => '* {field} Tidak sama',
+            'alpha_numeric' => '* {field} Hanya terdiri dari angka dan alfabet saja'
+
+        ));
+
+        if($this->form_validation->run() == false) {
+            $value = $this->exists_inputan_tambah_user(
+                $this->input->post('username'),
+                $this->input->post('password'),
+                $this->input->post('confirm_pw')
+            );
+            
+            $data = $this->data_form_tambah_user($value);
+            $data['title'] = "Form Tambah User";
+            
+        } else {
+            $username = $this->input->post('username');
+            $password = $this->input->post('password');
+            $confirm_pw = $this->input->post('confirm_pw');
+            $tugas = $this->user_model->create_user($username, $password);
+            if ($tugas) {
+                $value = $this->exists_inputan_tambah_user('', '', '');
+                $data = $this->data_form_tambah_user($value);
+                $data['title'] = "Tambah User Sukses";
+            } else {
+                $value = $this->exists_inputan_tambah_user($username, $password, $confirm_pw);
+                $data = $this->data_form_tambah_user($value);
+                $data['error'] = "* Error ketika mendaftarkan user!";
+                $data['title'] = "Form Tambah User";
+                
+            }
+        }
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/tambah_user/v_tambah_user', $data);
+        $this->load->view('admin/template/footer', $data);
+    }
+
+    public function average_cost() {
+        
+        $data['title'] = "Average Cost";
+        $bulan = $this->input->get('bulan');
+        if (!empty($bulan)) :
+            $data['datanya'] = $this->admin_model->pembelian_penjualan($bulan);
+        else :
+            $data['datanya'] = '';
+        endif;
+
+        $this->load->view('admin/template/header', $data);
+        $this->load->view('admin/average_cost/v_average_cost', $data);
+        $this->load->view('admin/template/footer', $data);
     }
 
     private function data_form_tambah_barang ($value) {
@@ -509,6 +772,53 @@ class Admin extends CI_Controller {
 
         return $value;
 
+    }
+
+    private function data_form_tambah_user($value) {
+        $data['form_att'] = array(
+            'id' => 'form_register'
+        );
+        $data['username_input'] = array(
+            'type' => 'text',
+            'name' => 'username',
+            'placeholder' => 'Username',
+            'value' => $value['username']
+        );
+        $data['password_input'] = array(
+            'type' => 'password',
+            'name' => 'password',
+            'placeholder' => 'Password',
+            'value' => $value['password']
+        );
+        $data['confirm_pw'] = array(
+            'type' => 'password',
+            'name' => 'confirm_pw',
+            'placeholder' => 'Confirm Password',
+            'value' => $value['confirm_pw']
+        );
+        $data['form_submit'] = array(
+            'type' => 'submit',
+            'value' => 'Register',
+        );
+        return $data;
+    }
+
+    private function exists_inputan_tambah_user ($username = '', $password = '', $confirm_pw = '') {
+        $value['username'] = '';
+        $value['password'] = '';
+        $value['confirm_pw'] = '';
+
+        if (!empty($username)) {
+            $value['username'] = $username;
+        } 
+        if (!empty($password)) {
+            $value['password'] = $password;
+        } 
+        if (!empty($confirm_pw)) {
+            $value['confirm_pw'] = $confirm_pw;
+        }
+
+        return $value;
     }
 
 }

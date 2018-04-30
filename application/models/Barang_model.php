@@ -33,7 +33,7 @@ class Barang_model extends CI_Model {
         $data = array(
             'id_user' => $data_transaksi->id_user,
             'total_barang' => $data_transaksi->total_barang,
-            'total_harga' => $data_transaksi->total_harga,
+            'total_harga' => $data_transaksi->total_harga_jual,
             'created' =>  date('Y-m-j H:i:s')
         );
 

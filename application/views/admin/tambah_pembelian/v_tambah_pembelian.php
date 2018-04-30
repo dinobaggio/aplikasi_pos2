@@ -1,27 +1,31 @@
-<div id='tambah_pembelian' align="center" class='container'>
-<h3>Pembelian barang</h3>
-<p>pilih produsen lalu pilih barang yang ingin dibeli</p>
+<h2><?= $title ?></h2>
 
-    <table class='table-bordered'>
-        <tr><td colspan='2' align='center'><h4><?= $title ?></h4></td></tr>
-        <tr>
-            <th scope="col" colspan='2' >Nama Produsen</th>
-        </tr>
+<div class="alert alert-info">
+  <strong>Info!</strong> pilih produsen lalu pilih barang yang ingin dibeli
+</div>
 
+<div id='tambah_pembelian' class=''>
+    <table>
         <tr v-for="produsen in data_produsen">
-            <td>{{produsen.nama_produsen}}</td> 
-            <td><a v-bind:href="'<?= base_url('admin/tambah_pembelian/') ?>' + produsen.id_produsen"
-            class="btn btn-success btn-sm">Pilih</a></td>
-            <td v-bind:id="'produsen'+produsen.id_produsen"></td>
-        </tr>
-
-        <tr>
-            <td colspan='2' align='center'>
-                <button id="proses_barang" v-on:click="proses_pembelian()" class='btn btn-success btn-sm'>{{button_proses}}</button>
-                <button v-on:click="clear()" class='btn btn-danger btn-sm'>Clear</button>
+            <td> 
+                <a v-bind:href="'<?= base_url('admin/tambah_pembelian/') ?>' + produsen.id_produsen"
+                class="btn btn-info">{{produsen.nama_produsen}}</a>
             </td>
-        </tr>
+            <td>
+                <div class="alert">
+                    <strong v-bind:id="'produsen'+produsen.id_produsen"></strong>
+                </div>
+            </td>
+        </tr>  
     </table>
+
+    <br>
+    
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" id="proses_barang" v-on:click="proses_pembelian()" class='btn btn-success btn-sm'>{{button_proses}}</button>
+        <button type="button" v-on:click="clear()" class='btn btn-danger btn-sm'>Clear</button>
+    </div>
+    
     
 
 </div>
@@ -67,8 +71,16 @@ let vm = new Vue({
                                 jumlah_barang += data_produsen.length;
                             }
                         }
-                        el_proses.attr('disabled', false);
-                        this.button_proses = 'Proses Keranjang (' +jumlah_barang+')';
+                        if (jumlah_barang <= 0) {
+                            localStorage.removeItem('keranjang');
+                            el_proses.attr('disabled', true);
+                            this.button_proses = 'Proses Keranjang';
+
+                        } else {
+                            el_proses.attr('disabled', false);
+                            this.button_proses = 'Proses Keranjang (' +jumlah_barang+')';
+                        }
+                        
                     }
                 }
             } else {

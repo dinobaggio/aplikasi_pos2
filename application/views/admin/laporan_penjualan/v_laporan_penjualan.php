@@ -1,11 +1,9 @@
 <div class="alert alert-info">
   <strong>Info!</strong> data tercatat secara dinamis, untuk sekarang Hanya maret yang ada datanya
 </div>
-
 <div id="laporan_pembelian">
 
-
-    <form action="<?= base_url('admin/laporan_pembelian') ?>" method="GET">
+    <form action="<?= base_url('admin/laporan_penjualan') ?>" method="GET">
         <table align="center">
             <tr>
                 <th>Masukan</th>
@@ -43,7 +41,7 @@
         
 
         <?php foreach ($laporan as $data) : 
-            $id_transaksi = $data->id_transaksi_pembelian;
+            $id_transaksi = $data->id_transaksi_penjualan;
             ?>    
             
             <tbody >
@@ -51,11 +49,17 @@
                     <td colspan='5'><b>ID transaksi:</b> <?= $id_transaksi ?></td>
                 </tr>
                 <tr>
+                    <td><b>Nama Pelanggan:</b> <?= $data->nama_pelanggan ?></td>
+                </tr>
+                <tr>
+                    <td><b>ID Pelanggan:</b> #<?= $data->id_user ?></td>
+                </tr>
+                <tr>
                     <td colspan='5'><b>Tanggal buat:</b> <?= $data->created ?></td>
                 </tr>
                 <tr id='barang<?= $id_transaksi ?>'>
                     <th>Nama Barang</th>
-                    <th>Harga Beli</th>
+                    <th>Harga Jual</th>
                     <th>Jumlah Barang</th>
                     <th>Jumlah Harga</th>
                     <th>Nama Produsen</th>
@@ -75,14 +79,14 @@
         <script>
             let barang<?= $id_transaksi ?> = document.getElementById("barang<?= $id_transaksi ?>");
             
-            $.post("<?= base_url('admin/laporan_pembelian_barang') ?>", {
-                id_transaksi_pembelian : <?= $id_transaksi ?>
+            $.post("<?= base_url('admin/laporan_penjualan_barang') ?>", {
+                id_transaksi_penjualan : <?= $id_transaksi ?>
             }, function (data) {
                 let barang = JSON.parse(data);
                 for (let i=0; i<barang.length;i++) {
                     
                     let nama = $("<td></td>").text(barang[i].nama_barang);
-                    let harga = $("<td></td>").text(barang[i].harga_beli);
+                    let harga = $("<td></td>").text(barang[i].harga_jual);
                     let jumlah_barang = $("<td></td>").text(barang[i].jumlah_barang);;
                     let jumlah_harga = $("<td></td>").text(barang[i].jumlah_harga);
                     let produsen = $("<td></td>").text(barang[i].nama_produsen);
@@ -113,7 +117,7 @@
 <script>
 
 function cetak (bulan) {
-    $.post("<?= base_url('admin/cetak_laporan_pembelian') ?>", {
+    $.post("<?= base_url('admin/cetak_laporan_penjualan') ?>", {
         bulan : bulan
     });
 }

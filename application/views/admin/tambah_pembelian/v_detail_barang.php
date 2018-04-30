@@ -1,15 +1,7 @@
-<div id="detail_barang_beli" align='center'>
-
-    <h3><?= $data_barang->nama_barang ?></h3>
+<h2><?= $data_barang->nama_barang ?></h2>
+<div id="detail_barang_beli">
 
     <table>
-
-        <tr>
-            <td colspan='3'>
-                <a href="<?= base_url('admin/tambah_pembelian/'.$id_produsen) ?>" class="btn btn-info btn-sm">Back</a>
-            </td>
-        </tr>
-
         <tr>
             <th>ID Barang</th><td>: #<?= $data_barang->id_barang ?></td>
         </tr>
@@ -31,8 +23,13 @@
 
         <tr>
             <td>
-                <button v-on:click="tambah_barang()" id='tambahkan' class="btn btn-info btn-sm">Tambahkan</button>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <a href="<?= base_url('admin/tambah_pembelian/'.$id_produsen) ?>" class="btn btn-secondary btn-sm">Back</a>
+                <button v-on:click="tambah_barang()" id='tambahkan' class="btn btn-success btn-sm">Tambahkan</button>
                 <button v-on:click="cancel()" id='cancel' style='display:none' class="btn btn-danger btn-sm" >Cancel</button>
+                
+            </div>
+                
             </td>
         </tr>
 
