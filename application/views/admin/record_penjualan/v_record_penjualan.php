@@ -7,8 +7,7 @@
         <th>ID Penjualan</th>
         <th>ID User</th>
         <th>Total Barang</th>
-        <th>Total Harga Beli</th>
-        <th>Total Harga Jual</th>
+        <th>Total Harga</th>
         <th>Created</th>
         <th>Detail</th>
     </tr>
@@ -18,8 +17,7 @@
         <td>#<?= $data->id_transaksi_penjualan ?></td>
         <td>#<?= $data->id_user ?></td>
         <td><?= $data->total_barang ?></td>
-        <td><?= $data->total_harga_beli ?></td>
-        <td><?= $data->total_harga_jual ?></td>
+        <td><?= $data->total_harga ?></td>
         <td> <?php
             $date = strtotime($data->created);
             echo date("Y-m-d h:i:s", $date);

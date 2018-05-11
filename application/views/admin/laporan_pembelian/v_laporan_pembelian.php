@@ -39,7 +39,7 @@
         <?php 
         if (!empty($laporan)) : ?>
         
-        <tr><td><button class="btn btn-success" onclick="cetak(<?= $bulan ?>)">Cetak</button></td></tr>
+        <tr><td><button class="btn btn-success" onclick="cetak('<?= $bulan ?>')">Cetak</button></td></tr>
         
 
         <?php foreach ($laporan as $data) : 
@@ -64,10 +64,7 @@
                     <td colspan='5'><b>Total Barang:</b> <?= $data->total_barang ?></td>
                 </tr>
                 <tr>
-                    <td colspan='5'><b>Total Harga Beli:</b> <?= $data->total_harga_beli ?></td>
-                </tr>
-                <tr>
-                    <td colspan='5'><b>Total Harga Jual:</b> <?= $data->total_harga_jual ?></td>
+                    <td colspan='5'><b>Total Harga :</b> <?= $data->total_harga ?></td>
                 </tr>
                 <tr><td colspan='5' ><br></td></tr>
             </tbody>
@@ -113,9 +110,7 @@
 <script>
 
 function cetak (bulan) {
-    $.post("<?= base_url('admin/cetak_laporan_pembelian') ?>", {
-        bulan : bulan
-    });
+    window.open("<?= base_url('admin/cetak_laporan_pembelian') ?>?bulan="+bulan, '_self');
 }
 
 </script>

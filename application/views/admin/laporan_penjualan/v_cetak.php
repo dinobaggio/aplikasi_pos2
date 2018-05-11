@@ -98,10 +98,7 @@
                     <td><b>Total Barang:</b> <?= $data->total_barang ?></td>
                 </tr>
                 <tr>
-                    <td><b>Total Harga Beli:</b> <?= $data->total_harga_beli ?></td>
-                </tr>
-                <tr>
-                    <td><b>Total Harga Jual:</b> <?= $data->total_harga_jual ?></td>
+                    <td><b>Total Harga:</b> <?= $data->total_harga ?></td>
                 </tr>
             </thead>
         </table>

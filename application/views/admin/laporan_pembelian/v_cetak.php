@@ -92,12 +92,9 @@
                     <td><b>Total Barang:</b> <?= $data->total_barang ?></td>
                 </tr>
                 <tr>
-                    <td><b>Total Harga Beli:</b> <?= $data->total_harga_beli ?></td>
+                    <td><b>Total Harga:</b> <?= $data->total_harga ?></td>
                 </tr>
-                <tr>
-                    <td><b>Total Harga Jual:</b> <?= $data->total_harga_jual ?></td>
-                </tr>
-            </thead>
+                
         </table>
         <br>
         <?php endforeach; ?>

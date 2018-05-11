@@ -59,6 +59,7 @@ class Admin extends CI_Controller {
             'numeric' => '* {field} Harus angka',
             'value_produsen' => '* {field} Harus dipilih'
         ));
+        
         $kosong = '';
         $id_produsen = $this->input->post("id_produsen");
         $nama_barang = $this->input->post("nama_barang");
@@ -385,7 +386,7 @@ class Admin extends CI_Controller {
     public function cetak_laporan_pembelian(){
         $this->load->library('pdfgenerator');
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
-        $bulan = $this->input->post("bulan");
+        $bulan = $this->input->get("bulan");
         if (isset($bulan)) {
             $data['laporan'] = $this->admin_model->laporan_bulanan_pembelian($bulan);
 
@@ -475,7 +476,7 @@ class Admin extends CI_Controller {
     public function cetak_laporan_penjualan(){
         $this->load->library('pdfgenerator');
         cek_bukan_admin(); //ini helper $this->load->helper('user'); home made
-        $bulan = $this->input->post("bulan");
+        $bulan = $this->input->get("bulan");
         if (isset($bulan)) {
             $data['laporan'] = $this->admin_model->laporan_bulanan_penjualan($bulan);
 

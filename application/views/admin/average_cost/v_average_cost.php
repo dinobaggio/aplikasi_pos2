@@ -38,8 +38,7 @@
     <tr>
         <th>ID</th>
         <th>Total Barang</th>
-        <th>Total Harga Beli</th>
-        <th>Total Harga Jual</th>
+        <th>Total Harga</th>
         <th>Kategori</th>
         <th>created</th>
     </tr>
@@ -49,8 +48,7 @@
     <tr>
         <td>#<?= $data->id ?></td>
         <td><?= $data->total_barang ?></td>
-        <td><?= $data->total_harga_beli ?></td>
-        <td><?= $data->total_harga_jual ?></td>
+        <td><?= $data->total_harga ?></td>
         <?php if ($data->kategori == 0) : ?>
             <td>Pembelian</td>
         <?php else : ?>

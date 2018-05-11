@@ -167,8 +167,7 @@ class Admin_model extends CI_Model {
             transaksi_pembelian.id_transaksi_pembelian,
             transaksi_pembelian.created,
             transaksi_pembelian.total_barang,
-            transaksi_pembelian.total_harga_beli,
-            transaksi_pembelian.total_harga_jual
+            transaksi_pembelian.total_harga,
         ");
         $this->db->from("transaksi_pembelian");
         $this->db->where(array(
@@ -185,8 +184,7 @@ class Admin_model extends CI_Model {
             transaksi_penjualan.id_transaksi_penjualan,
             transaksi_penjualan.created,
             transaksi_penjualan.total_barang,
-            transaksi_penjualan.total_harga_beli,
-            transaksi_penjualan.total_harga_jual,
+            transaksi_penjualan.total_harga,
             pelanggan.id_user,
             pelanggan.nama_pelanggan
         ");
@@ -257,8 +255,8 @@ class Admin_model extends CI_Model {
         if ($bulan) :
             $tahun = 2018;
             $que = $this->db->query(
-                "SELECT id_transaksi_pembelian as id, total_barang, total_harga_beli, total_harga_jual, created, kategori from transaksi_pembelian WHERE MONTH(created) = $bulan AND YEAR(created) = $tahun
-                UNION SELECT id_transaksi_penjualan as id, total_barang, total_harga_beli, total_harga_jual, created, kategori from transaksi_penjualan
+                "SELECT id_transaksi_pembelian as id, total_barang, total_harga, created, kategori from transaksi_pembelian WHERE MONTH(created) = $bulan AND YEAR(created) = $tahun
+                UNION SELECT id_transaksi_penjualan as id, total_barang, total_harga, created, kategori from transaksi_penjualan
                 WHERE MONTH(created) = $bulan AND YEAR(created) = $tahun ORDER BY created DESC"
             );
             
